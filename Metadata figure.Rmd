@@ -1,0 +1,25 @@
+---
+title: "Metadata figure"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+Setup
+```{r setup, include=FALSE}
+require(tidyverse)
+require(readxl)
+```
+
+#load data
+```{r}
+d<-read_excel("Metadata figure.xlsx")
+```
+
+#Plot
+```{r}
+ggplot(filter(d, !is.na(Stations)), aes(x=Region, y=Stations, fill=interaction(Source, Parameter)))+
+  geom_bar(stat="identity")+
+  facet_grid(~Season)
+```
+
