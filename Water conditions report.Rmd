@@ -1,0 +1,166 @@
+---
+title: "Water conditions report"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+require(sf)
+require(rgdal)
+require(raster)
+require(tidyverse)
+require(readxl)
+require(ggthemes)
+
+insert_minor <- function(major_labs, n_minor) {labs <- 
+                              c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
+                              labs[1:(length(labs)-n_minor)]}
+```
+
+#Download and load data
+
+##Zooplankton
+```{r}
+#CB
+    if (!file.exists("Data/1972-2018CBMatrix.xlsx")) {
+      download.file("ftp://ftp.wildlife.ca.gov/IEP_Zooplankton/1972-2018CBMatrix.xlsx", 
+                    "Data/1972-2018CBMatrix.xlsx", mode="wb")
+    }
+
+#Myside
+    if (!file.exists("Data/1972-2018MysidMatrix.xlsx")) {
+      download.file("ftp://ftp.wildlife.ca.gov/IEP_Zooplankton/1972-2018MysidMatrix.xlsx", 
+                    "Data/1972-2018MysidMatrix.xlsx", mode="wb")
+    }
+
+#Pump
+    if (!file.exists("Data/1972-2018Pump Matrix.xlsx")) {
+      download.file("ftp://ftp.wildlife.ca.gov/IEP_Zooplankton/1972-2018Pump Matrix.xlsx", 
+                    "Data/1972-2018Pump Matrix.xlsx", mode="wb")
+    }
+```
+
+
+```{r}
+ZoopCB<-read_excel("Data/1972-2018CBMatrix.xlsx", 
+                          sheet = "CB CPUE Matrix 1972-2018", 
+                          col_types = c("numeric","numeric", "numeric", "numeric", "date", 
+                                        "text", "text", "text", "numeric", "text", "text",
+                                        "text", rep("numeric", 62)))%>%
+  filter(Core%in%c(1,2))%>%
+  select(Volume=CBVolume, Year, Date, Station, A_sinensis=ACARTELA, Acartia_spp.=ACARTIA, Diaptomidae_spp.=DIAPTOM, E_affinis=EURYTEM, Calanoida_spp.=OTHCALAD, P_forbesi=PDIAPFOR, P_marinus=PDIAPMAR, S_doerrii=SINOCAL, Tortanus_spp.=TORTANUS, All_Calanoids=ALLCALADULTS, A_vernalis=AVERNAL, B_longirostris=BOSMINA, Daphnia_spp.=DAPHNIA, Diaphanosoma_spp.=DIAPHAN, Cladocera_spp.=OTHCLADO, All_Cladocerans=ALLCLADOCERA)%>%
+  gather(key="Taxa", value="CPUE", -Volume, -Year, -Date, -Station)
+
+
+ZoopMysid<-read_excel("Data/1972-2018MysidMatrix.xlsx", 
+                          sheet = "Mysid CPUE Matrix 1972-2018 ", 
+                          col_types = c(rep("numeric", 4), "date", rep("text", 3), 
+                                        "numeric", "text", rep("numeric", 14)))%>%
+  filter(Core%in%c(1,2))%>%
+  select(Date=SampleDate, Volume=MysidVolume, Year, Station, A_aspera=`A_ aspera`, A_hwanhaiensis=`A_ hwanhaiensis`, A_macropsis=`A_ macropsis`, D_holmquistae=`D_ holmquistae`, H_longirostris=`H_ longirostris`, N_kadiakensis=`N_ kadiakensis`, N_mercedis=`N_ mercedis`, UnID_mysid=`Unidentified mysid`)%>%
+  mutate(All_Mysids=rowSums(select(., A_aspera:UnID_mysid), na.rm=T))%>%
+  gather(key="Taxa", value="CPUE", -Volume, -Year, -Date, -Station)
+
+
+ZoopPump<-read_excel("Data/1972-2018Pump Matrix.xlsx", 
+                      sheet = " Pump CPUE Matrix 1972-2018", 
+                      col_types = c("numeric","numeric", "numeric", "numeric", "date", 
+                                    "text", "text", "text", "numeric", 
+                                    "text", rep("numeric", 36)))%>%
+  filter(Core%in%c(1,2))%>%
+  select(Date=SampleDate, Volume=PumpVolume, Year, Station, Limnoithona=TotalLimno)%>%
+  gather(key="Taxa", value="CPUE", -Volume, -Year, -Date, -Station)
+
+Zoop<-bind_rows(ZoopCB, ZoopMysid, ZoopPump)%>%
+  mutate(Month=month(Date))
+```
+
+##Stations and regions
+```{r}
+Stations<-read_excel("Data/zoop_stations.xlsx", sheet="lat_long")%>%
+  filter(Project=="EMP")%>%
+  select(-Project)%>%
+  distinct()%>%
+  drop_na()
+
+#Load delta regions shapefile from Morgan
+Deltaregions<-st_read("Data/Delta regions")
+Deltaregions<-as(Deltaregions, "Spatial")
+
+#Match each unique region from zoop dataset to a region from the shapefile
+Locations<-Stations
+coordinates(Locations) <- ~Longitude+Latitude
+proj4string(Locations) <- CRS("+proj=longlat +datum=NAD83")
+Locations <- spTransform(Locations, proj4string(Deltaregions))
+Locations<-Locations %over% Deltaregions
+Stations<-Stations%>%
+  bind_cols(Locations%>%
+              dplyr::select(Region=Stratum))
+
+#Add regions and lat/long to zoop dataset
+Zoopsum<-Zoop%>%
+  left_join(Stations, by="Station")%>%
+  filter(!is.na(Region))%>% #####################################NEED TO FIGURE OUT WHAT TO DO WITH NA STATIONS, OR WHICH STATIONS TO EXCLUDE###############################
+  group_by(Region, Year, Taxa)%>%
+  summarise(CPUE=mean(CPUE, na.rm=T))%>%
+  ungroup()
+```
+
+
+#Plot
+
+##Mysids
+
+```{r}
+Zoopsum%>%
+  filter(Year>1991, Taxa%in%c("A_aspera", "A_hwanhaiensis", "A_macropsis", "D_holmquistae", "H_longirostris", "N_kadiakensis", "N_mercedis"))%>%
+  ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+  geom_area()+
+  scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+  facet_wrap(~Region)+
+  theme_bw()+
+  theme(panel.grid=element_blank(), strip.background = element_blank())
+```
+
+##Calanoids
+
+```{r}
+Zoopsum%>%
+  filter(Year>1991, Taxa%in%c("A_sinensis", "Acartia_spp.", "Diaptomidae_spp.", "E_affinis", "Calanoida_spp.", "P_forbesi", "P_marinus", "S_doerrii", "Tortanus_spp."))%>%
+  ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+  geom_area()+
+  scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+  coord_cartesian(expand=0)+
+  facet_wrap(~Region)+
+  theme_bw()+
+  theme(panel.grid=element_blank(), strip.background = element_blank())
+```
+
+##Cyclopoids
+
+```{r}
+Zoopsum%>%
+  filter(Year>1991, Taxa%in%c("A_vernalis", "Limnoithona"))%>%
+  ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+  geom_area()+
+  scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+  coord_cartesian(expand=0)+
+  facet_wrap(~Region)+
+  theme_bw()+
+  theme(panel.grid=element_blank(), strip.background = element_blank())
+```
+
+##Cladocerans
+
+```{r}
+Zoopsum%>%
+  filter(Year>1991, Taxa%in%c("B_longirostris", "Daphnia_spp.", "Diaphanosoma_spp.", "Cladocera_spp."))%>%
+  ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+  geom_area()+
+  scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+  coord_cartesian(expand=0)+
+  facet_wrap(~Region)+
+  theme_bw()+
+  theme(panel.grid=element_blank(), strip.background = element_blank())
+```
