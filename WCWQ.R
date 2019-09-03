@@ -64,7 +64,7 @@ WCWQer<-function(){
                        }}, 
                      simplify=FALSE) %>% 
                 bind_rows())%>%
-    mutate(Year=year(Date))
+    mutate(MonthYear=floor_date(Date, unit = "month"))
   
   # Add regions and summarise -------------------------------------------------------------
   
@@ -90,31 +90,45 @@ WCWQer<-function(){
   WQsum<-WQ%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, Year)%>%
+    group_by(Region, MonthYear)%>%
     summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T))%>%
-    ungroup()
+    ungroup()%>%
+    filter(year(MonthYear)>1991)
   
   
   # Plot --------------------------------------------------------------------
   
   plotWQ<-function(Parameter, ylabel){
     Parameter<-enquo(Parameter)
-    WQsum%>%
-    filter(Year>1991)%>%
-    ggplot(aes(x=Year, y=!!Parameter))+
-    geom_line()+
-    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    coord_cartesian(expand=0)+
-    facet_wrap(~Region)+
-    ylab(ylabel)+
-    theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
+      ggplot()+
+      geom_line(data=WQsum, aes(x=MonthYear, y=!!Parameter))+
+      coord_cartesian(expand=0)+
+      facet_wrap(~Region)+
+      ylab(ylabel)+
+      xlab("Date")+
+      theme_bw()+
+      theme(panel.grid=element_blank(), strip.background = element_blank())
   }
-    
-    pTemp<-plotWQ(Temperature, "Temperature (°C)")
-    pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)")
-    pChla<-plotWQ(Chla, "Chlorophyll a (µg/L)")
+  
+  TempShades<-expand.grid(Region=unique(WQsum$Region), Quality=c("Good", "OK", "Bad"))%>%
+    mutate(xmin=min(WQsum$MonthYear),
+           xmax=max(WQsum$MonthYear),
+           ymin=case_when(
+             Quality=="Good" ~ min(WQsum$Temperature),
+             Quality=="OK" ~ 20,
+             Quality=="Bad" ~ 26
+           ),
+           ymax=case_when(
+             Quality=="Good" ~ 20,
+             Quality=="OK" ~ 26,
+             Quality=="Bad" ~ max(WQsum$Temperature)
+           ))
+  
+  pTemp<-plotWQ(Temperature, "Temperature (°C)")+geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3, color=NA)+scale_fill_manual(values=c("chartreuse4", "goldenrod1", "firebrick3"), guide=F)
+  pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)")
+  pChla<-plotWQ(Chla, "Chlorophyll a (µg/L)")
   
   return(list(Temperature=pTemp, Secchi=pSecchi, Chlorophyll=pChla))
   
 }
+#ggsave(test$Temperature, filename="Temperature.png", device = "png", width = 7.5, height=5, units="in")
