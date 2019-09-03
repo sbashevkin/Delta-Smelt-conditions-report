@@ -1,4 +1,4 @@
-WCWQer<-function(Download=F){
+WCWQer<-function(){
   
   
   # Setup -------------------------------------------------------------------
@@ -20,66 +20,57 @@ WCWQer<-function(Download=F){
   # Download data -----------------------------------------------------------
   
   
-  #download.file("https://raw.githubusercontent.com/InteragencyEcologicalProgram/Status-and-Trends/master/wq_stations.csv", "Data/wq_stations.csv", mode="wb")
-  #download.file("https://raw.githubusercontent.com/InteragencyEcologicalProgram/Status-and-Trends/master/WQ_Discrete_1975-2017.csv", "Data/WQ_Discrete_1975-2017.csv", mode="wb")
   
   # Load and combine data ---------------------------------------------------
   
-  WQ<-read_csv("Data/WQ_Discrete_1975-2017.csv", 
-                     col_types = "cccccc")%>%
-    mutate(value=as.numeric(as.character(value)))
-    rename(Date=date, Station=name)%>%
-    select(-units, -id)%>%
-    mutate(Date=parse_date_time(Date, "%m/%d/%Y %H:%M"))%>%
-    group_by(Date, Station, parameter)%>%
-    summarise()
-    spread(key=parameter, value = value, convert=T)
-    select(Date, Station, ACARTELA, ACARTIA, DIAPTOM, EURYTEM, OTHCALAD, PDIAPFOR, PDIAPMAR, SINOCAL, TORTANUS, AVERNAL, OTHCYCAD, BOSMINA, DAPHNIA, DIAPHAN, OTHCLADO)%>%
-    gather(key="Taxa", value="CPUE", -Date, -Station)
+  Fieldfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Field")
   
+  Labfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Lab")
   
-  ZoopPump<-read_excel("Data/1972-2018Pump Matrix.xlsx", 
-                       sheet = " Pump CPUE Matrix 1972-2018", 
-                       col_types = c("numeric","numeric", "numeric", "numeric", "date", 
-                                     "text", "text", "text", "numeric", 
-                                     "text", rep("numeric", 36)))%>%
-    select(Date=SampleDate, Station, LIMNOSPP, LIMNOSINE, LIMNOTET, OITHDAV, OITHSIM, OITHSPP)%>%
-    gather(key="Taxa", value="CPUE",-Date, -Station)
+  Widefiles <- list.files(path = "Data/Water quality", full.names = T, pattern="EMP")
   
-  
-  
-  ZoopMysid<-read_excel("Data/EMPMysidBPUEMatrixAug2019.xlsx",
-                        sheet="MysidBPUEMatrix1972-2018",
-                        col_types = c(rep("numeric", 4), "date", "text", "text", "numeric", "numeric", "text", "text", rep("numeric", 16)))%>%
-    #mutate(Date=parse_date_time(Date, orders="mdy"))%>%
-    select(Date, Station, `Acanthomysis aspera`:`Unidentified mysid`)%>%
-    mutate(Mysida=rowSums(select(., -Date, -Station), na.rm=T))%>%
-    gather(key="Taxa", value="BPUE", -Date, -Station)%>%
-    mutate(BPUE=BPUE*1000,
-           Taxa="Mysida") # Convert to ug
-  
-  Zoopmass<-read_csv("Data/zoop_individual_mass.csv", col_types = "cd")
-  
-  Zoop<-bind_rows(ZoopCB, ZoopPump)%>%
-    left_join(Zoopmass, by=c("Taxa"="taxon"))%>%
-    mutate(BPUE=CPUE*mass_indiv_ug,
-           Taxa=case_when(
-             Taxa%in%c("ACARTELA", "ACARTIA", "DIAPTOM", "EURYTEM", "OTHCALAD", "PDIAPFOR", "PDIAPMAR", "SINOCAL", "TORTANUS") ~ "Calanoida",
-             Taxa%in%c("AVERNAL", "LIMNOSPP", "LIMNOSINE", "LIMNOTET", "OITHDAV", "OITHSIM", "OITHSPP", "OTHCYCAD") ~ "Cyclopoida",
-             Taxa%in%c("BOSMINA", "DAPHNIA", "DIAPHAN", "OTHCLADO") ~ "Cladocera"))%>%
-    select(-CPUE, -mass_indiv_ug)%>%
-    bind_rows(ZoopMysid)%>%
+  WQ<-sapply(Fieldfiles, function(x) read_excel(x, guess_max = 5e4))%>%
+    bind_rows()%>%
+    select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult)%>%
+    filter(Parameter%in%c("Temperature", "Secchi Depth"))%>%
+    group_by(Date, Station, Parameter, Notes)%>%
+    summarise(Value=mean(Value, na.rm=T))%>%
+    ungroup()%>%
+    bind_rows(sapply(Labfiles, function(x) read_excel(x, guess_max = 5e4))%>%
+                bind_rows()%>%
+                select(Station=StationCode, Date=SampleDate, Parameter=ConstituentName, Value=Result, Notes=LabAnalysisRemarks)%>%
+                filter(Parameter=="Chlorophyll a")%>%
+                group_by(Date, Station, Parameter, Notes)%>%
+                summarise(Value=mean(Value, na.rm=T))%>%
+                ungroup())%>%
+    spread(key=Parameter, value=Value)%>%
+    rename(Chla=`Chlorophyll a`, Secchi_depth=`Secchi Depth`)%>%
+    bind_rows(sapply(Widefiles, function(x) read_excel(x)%>%
+                       select(Station=`Station Name`, Date=`Sample Date`, Chla=`Chlorophyll a µg/L`, Notes=`Field Notes`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=`Water Temperature °C`)%>%
+                       {if(is.character(.$Chla)){
+                         mutate(., Chla=parse_double(ifelse(Chla%in%c("<0.05", "<0.5"), 0, Chla), na = c("", "NA", "N/A", "<R.L.")))
+                       } else{
+                         .
+                       }}%>%
+                       {if(is.character(.$Secchi_depth)){
+                         mutate(., Secchi_depth=parse_double(Secchi_depth, na = c("", "NA", "N/A", "Too dark")))
+                       } else{
+                         .
+                       }}%>%
+                       {if(is.character(.$Temperature)){
+                         mutate(., Temperature=parse_double(Temperature, na = c("", "NA", "N/A")))
+                       } else{
+                         .
+                       }}, 
+                     simplify=FALSE) %>% 
+                bind_rows())%>%
     mutate(Year=year(Date))
-  
   
   # Add regions and summarise -------------------------------------------------------------
   
-  Stations<-read_csv("Data/zoop_stations.csv",
-                     col_types = "cdcdddddddd")%>%
-    mutate(Latitude=lat_deg+lat_min/60+lat_sec/3600,
-           Longitude=(long_deg+long_min/60+long_sec/3600)*(-1))%>%
-    select(Station=station, Latitude, Longitude)%>%
-    drop_na()
+  Stations<-read_csv("Data/wq_stations.csv",
+                     col_types = "cddc")%>%
+    select(Station=site, Latitude=lat, Longitude=long)
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)
@@ -93,32 +84,37 @@ WCWQer<-function(Download=F){
   Locations<-Locations %over% Deltaregions
   Stations<-Stations%>%
     bind_cols(Locations%>%
-                dplyr::select(Region=Stratum))%>%
-    mutate(Region=replace_na(as.character(Region), "San Pablo Bay"))
+                dplyr::select(Region=Stratum))
   
   #Add regions and lat/long to zoop dataset
-  Zoopsum<-Zoop%>%
+  WQsum<-WQ%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, Year, Taxa)%>%
-    summarise(BPUE=mean(BPUE, na.rm=T))%>%
+    group_by(Region, Year)%>%
+    summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T))%>%
     ungroup()
   
   
   # Plot --------------------------------------------------------------------
   
-  p<-Zoopsum%>%
+  plotWQ<-function(Parameter, ylabel){
+    Parameter<-enquo(Parameter)
+    WQsum%>%
     filter(Year>1991)%>%
-    mutate(Taxa=factor(Taxa, levels=c("Calanoida", "Cyclopoida", "Cladocera", "Mysida")))%>%
-    ggplot(aes(x=Year, y=BPUE, fill=Taxa))+
-    geom_area()+
+    ggplot(aes(x=Year, y=!!Parameter))+
+    geom_line()+
     scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    scale_fill_manual(values=brewer.pal(4, "BrBG"))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
+    ylab(ylabel)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank())
+  }
+    
+    pTemp<-plotWQ(Temperature, "Temperature (°C)")
+    pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)")
+    pChla<-plotWQ(Chla, "Chlorophyll a (µg/L)")
   
-  return(p)
+  return(list(Temperature=pTemp, Secchi=pSecchi, Chlorophyll=pChla))
   
 }

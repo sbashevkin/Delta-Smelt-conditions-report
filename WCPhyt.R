@@ -1,3 +1,5 @@
+#MISSING STATION LAT LONGS FOR SOME STATIONS
+
 WCPhyter<-function(Download=F){
   
   
@@ -29,9 +31,6 @@ WCPhyter<-function(Download=F){
   
   # Load and combine data ---------------------------------------------------
   
-  
-  #**********Only including OTHCYCAD from CB because biomass indicates they're large, and only including small cyclopoids from pump sample******#
-  
   Phyto<-read_csv("Data/Phytoplankton_Algal_Type_Data_1975_-2016.csv",
                   col_types = "ccddddddddddddddddddd")%>%
     rename(Date=SampleDate, Station=StationCode)%>%
@@ -46,11 +45,9 @@ WCPhyter<-function(Download=F){
   
   # Add regions and summarise -------------------------------------------------------------
   
-  Stations<-read_csv("Data/zoop_stations.csv",
-                     col_types = "cdcdddddddd")%>%
-    mutate(Latitude=lat_deg+lat_min/60+lat_sec/3600,
-           Longitude=(long_deg+long_min/60+long_sec/3600)*(-1))%>%
-    select(Station=station, Latitude, Longitude)%>%
+  Stations<-read_csv("Data/wq_stations.csv",
+                     col_types = "cddc")%>%
+    select(Station=site, Latitude=lat, Longitude=long)%>%
     drop_na()
   
   #Load delta regions shapefile from Morgan
@@ -65,10 +62,9 @@ WCPhyter<-function(Download=F){
   Locations<-Locations %over% Deltaregions
   Stations<-Stations%>%
     bind_cols(Locations%>%
-                dplyr::select(Region=Stratum))%>%
-    mutate(Region=replace_na(as.character(Region), "San Pablo Bay"))
+                dplyr::select(Region=Stratum))
   
-  #Add regions and lat/long to zoop dataset
+  #Add regions and lat/long to phyto dataset
   Phytosum<-Phyto%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
@@ -85,7 +81,7 @@ WCPhyter<-function(Download=F){
     ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
     geom_area()+
     scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    scale_fill_manual(values=brewer.pal(4, "BrBG"))+
+    scale_fill_manual(values=brewer.pal(7, "BrBG"))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     theme_bw()+
