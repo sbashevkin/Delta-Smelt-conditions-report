@@ -40,7 +40,8 @@ WCPhyter<-function(Download=F){
                           Taxa%in%c("Other flagellate", "Unknown Flagellates") ~ "Other flagellates",
                           Taxa%in%c("Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates") ~ Taxa,
                           TRUE ~ "Other taxa"))%>%
-    mutate(Year=year(Date))
+    mutate(Year=year(Date),
+           MonthYear=floor_date(Date, unit = "month"))
   
   
   # Add regions and summarise -------------------------------------------------------------
@@ -68,7 +69,7 @@ WCPhyter<-function(Download=F){
   Phytosum<-Phyto%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, Year, Taxa)%>%
+    group_by(Region, Year, MonthYear, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()
   
@@ -78,11 +79,12 @@ WCPhyter<-function(Download=F){
   p<-Phytosum%>%
     filter(Year>1991)%>%
     mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Other flagellates", "Other taxa")))%>%
-    ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+    ggplot(aes(x=MonthYear, y=CPUE, fill=Taxa))+
     geom_area()+
-    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
     scale_fill_manual(values=brewer.pal(7, "BrBG"))+
-    coord_cartesian(expand=0)+
+    xlab("Date")+
+    coord_cartesian(expand=0, ylim=c(0,200000))+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank())

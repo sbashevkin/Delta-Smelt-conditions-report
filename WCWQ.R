@@ -32,7 +32,7 @@ WCWQer<-function(){
   WQ<-sapply(Fieldfiles, function(x) read_excel(x, guess_max = 5e4))%>%
     bind_rows()%>%
     select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult)%>%
-    filter(Parameter%in%c("Temperature", "Secchi Depth"))%>%
+    filter(Parameter%in%c("Temperature", "Secchi Depth", "Conductance (EC)"))%>%
     group_by(Date, Station, Parameter, Notes)%>%
     summarise(Value=mean(Value, na.rm=T))%>%
     ungroup()%>%
@@ -44,9 +44,9 @@ WCWQer<-function(){
                 summarise(Value=mean(Value, na.rm=T))%>%
                 ungroup())%>%
     spread(key=Parameter, value=Value)%>%
-    rename(Chla=`Chlorophyll a`, Secchi_depth=`Secchi Depth`)%>%
+    rename(Chla=`Chlorophyll a`, Secchi_depth=`Secchi Depth`, Conductance=`Conductance (EC)`)%>%
     bind_rows(sapply(Widefiles, function(x) read_excel(x)%>%
-                       select(Station=`Station Name`, Date=`Sample Date`, Chla=`Chlorophyll a µg/L`, Notes=`Field Notes`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=`Water Temperature °C`)%>%
+                       select(Station=`Station Name`, Date=`Sample Date`, Chla=`Chlorophyll a µg/L`, Notes=`Field Notes`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=`Water Temperature °C`, Conductance=`Specific Conductance uS/cm@25degC`)%>%
                        {if(is.character(.$Chla)){
                          mutate(., Chla=parse_double(ifelse(Chla%in%c("<0.05", "<0.5"), 0, Chla), na = c("", "NA", "N/A", "<R.L.")))
                        } else{
@@ -61,10 +61,16 @@ WCWQer<-function(){
                          mutate(., Temperature=parse_double(Temperature, na = c("", "NA", "N/A")))
                        } else{
                          .
+                       }}%>%
+                       {if(is.character(.$Conductance)){
+                         mutate(., Conductance=parse_double(Conductance, na = c("", "NA", "N/A")))
+                       } else{
+                         .
                        }}, 
                      simplify=FALSE) %>% 
                 bind_rows())%>%
-    mutate(MonthYear=floor_date(Date, unit = "month"))
+    mutate(MonthYear=floor_date(Date, unit = "month"),
+           Salinity=((0.36966/(((Conductance*0.001)^(-1.07))-0.00074))*1.28156))
   
   # Add regions and summarise -------------------------------------------------------------
   
@@ -91,7 +97,7 @@ WCWQer<-function(){
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
     group_by(Region, MonthYear)%>%
-    summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T))%>%
+    summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T), Salinity=mean(Salinity, na.rm=T))%>%
     ungroup()%>%
     filter(year(MonthYear)>1991)
   
@@ -127,8 +133,9 @@ WCWQer<-function(){
   pTemp<-plotWQ(Temperature, "Temperature (°C)")+geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3, color=NA)+scale_fill_manual(values=c("chartreuse4", "goldenrod1", "firebrick3"), guide=F)
   pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)")
   pChla<-plotWQ(Chla, "Chlorophyll a (µg/L)")
+  pSal<-plotWQ(Salinity, "Salinity")
   
-  return(list(Temperature=pTemp, Secchi=pSecchi, Chlorophyll=pChla))
+  return(list(Temperature=pTemp, Secchi=pSecchi, Chlorophyll=pChla, Salinity=pSal))
   
 }
 #ggsave(test$Temperature, filename="Temperature.png", device = "png", width = 7.5, height=5, units="in")

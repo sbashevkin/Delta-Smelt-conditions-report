@@ -77,7 +77,8 @@ WCZooper<-function(Download=F){
              Taxa%in%c("BOSMINA", "DAPHNIA", "DIAPHAN", "OTHCLADO") ~ "Cladocera"))%>%
     select(-CPUE, -mass_indiv_ug)%>%
     bind_rows(ZoopMysid)%>%
-    mutate(Year=year(Date))
+    mutate(Year=year(Date),
+           MonthYear=floor_date(Date, unit = "month"))
 
 
 # Add regions and summarise -------------------------------------------------------------
@@ -101,14 +102,13 @@ WCZooper<-function(Download=F){
   Locations<-Locations %over% Deltaregions
   Stations<-Stations%>%
     bind_cols(Locations%>%
-                dplyr::select(Region=Stratum))%>%
-    mutate(Region=replace_na(as.character(Region), "San Pablo Bay"))
+                dplyr::select(Region=Stratum))
   
   #Add regions and lat/long to zoop dataset
   Zoopsum<-Zoop%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, Year, Taxa)%>%
+    group_by(Region, MonthYear, Year, Taxa)%>%
     summarise(BPUE=mean(BPUE, na.rm=T))%>%
     ungroup()
   
@@ -118,11 +118,12 @@ WCZooper<-function(Download=F){
   p<-Zoopsum%>%
     filter(Year>1991)%>%
     mutate(Taxa=factor(Taxa, levels=c("Calanoida", "Cyclopoida", "Cladocera", "Mysida")))%>%
-    ggplot(aes(x=Year, y=BPUE, fill=Taxa))+
+    ggplot(aes(x=MonthYear, y=BPUE, fill=Taxa))+
     geom_area()+
-    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
     scale_fill_manual(values=brewer.pal(4, "BrBG"))+
     coord_cartesian(expand=0)+
+    xlab("Date")+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank())
