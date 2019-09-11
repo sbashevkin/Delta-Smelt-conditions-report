@@ -69,25 +69,42 @@ WCPhyter<-function(Download=F){
   Phytosum<-Phyto%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, Year, MonthYear, Taxa)%>%
+    group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
-    ungroup()
+    ungroup()%>%
+    filter(Year>1991)%>%
+    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Other flagellates", "Other taxa")),
+           missing="na",
+           Region=as.character(Region))%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Phytomissing<-Phytosum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Phytosum<-Phytosum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
+  
+  Peak<-tibble(Region=Phytosum$Region[which.max(Phytosum$CPUE)], Year=Phytosum$Year[which.max(Phytosum$CPUE)], label=paste0("Peak CPUE: ", format(round(max(Phytosum$CPUE)), big.mark=",")))
   
   
   # Plot --------------------------------------------------------------------
   
-  p<-Phytosum%>%
-    filter(Year>1991)%>%
-    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Other flagellates", "Other taxa")))%>%
-    ggplot(aes(x=MonthYear, y=CPUE, fill=Taxa))+
-    geom_area()+
+  p<-ggplot()+
+    geom_bar(data=Phytosum, aes(x=Year, y=CPUE, fill=Taxa), stat="identity")+
+    geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
+    geom_label(data=Peak, aes(x=Year-7, y=35000, label=label), size=3)+
     #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
     scale_fill_manual(values=brewer.pal(7, "BrBG"))+
     xlab("Date")+
-    coord_cartesian(expand=0, ylim=c(0,200000))+
+    coord_cartesian(expand=0, ylim=c(0,40000))+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank())
+  
+  p
   
   return(p)
   

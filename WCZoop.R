@@ -108,7 +108,7 @@ WCZooper<-function(Download=F){
   Zoopsum<-Zoop%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
-    group_by(Region, MonthYear, Year, Taxa)%>%
+    group_by(Region, Year, Taxa)%>%
     summarise(BPUE=mean(BPUE, na.rm=T))%>%
     ungroup()
   
@@ -118,16 +118,16 @@ WCZooper<-function(Download=F){
   p<-Zoopsum%>%
     filter(Year>1991)%>%
     mutate(Taxa=factor(Taxa, levels=c("Calanoida", "Cyclopoida", "Cladocera", "Mysida")))%>%
-    ggplot(aes(x=MonthYear, y=BPUE, fill=Taxa))+
+    ggplot(aes(x=Year, y=BPUE, fill=Taxa))+
     geom_area()+
-    #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     scale_fill_manual(values=brewer.pal(4, "BrBG"))+
     coord_cartesian(expand=0)+
     xlab("Date")+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank())
-  
+  p
   return(p)
   
   }

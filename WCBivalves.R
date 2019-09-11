@@ -11,10 +11,6 @@ WCBivalver<-function(Download=F){
   require(readxl)
   require(lubridate)
   require(RColorBrewer)
-  
-  insert_minor <- function(major_labs, n_minor) {labs <- 
-    c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
-  labs[1:(length(labs)-n_minor)]}
 
   
   # Load and combine data ---------------------------------------------------
@@ -49,27 +45,41 @@ WCBivalver<-function(Download=F){
   
   #Add regions and lat/long to zoop dataset
   Bivsum<-Biv%>%
+    filter(Year>1991)%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
     group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
-    ungroup()
+    ungroup()%>%
+    mutate(missing="na",
+           Region=as.character(Region))%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Bivmissing<-Bivsum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Bivsum<-Bivsum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
+  
   
   
   # Plot --------------------------------------------------------------------
   
   p<-Bivsum%>%
-    filter(Year>1991)%>%
     ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+    geom_vline(data=Bivmissing, aes(xintercept=Year), linetype=2)+
     geom_area()+
-    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     xlab("Date")+
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2))
-  
+  p
   return(p)
   
 }
