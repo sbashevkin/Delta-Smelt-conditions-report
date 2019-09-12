@@ -5,7 +5,6 @@ WCPhyter<-function(Download=F){
   
   # Setup -------------------------------------------------------------------
   
-  
   require(sf)
   require(rgdal)
   require(raster)
@@ -17,18 +16,7 @@ WCPhyter<-function(Download=F){
   insert_minor <- function(major_labs, n_minor) {labs <- 
     c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
   labs[1:(length(labs)-n_minor)]}
-  
-  
-  # Download data -----------------------------------------------------------
-  
-  
-  #CB
-  if (Download) {
-    download.file("https://emp.baydeltalive.com/assets/06942155460a79991fdf1b57f641b1b4/text/csv/Phytoplankton_Algal_Type_Data_1975_-2016.csv", 
-                  "Data/Phytoplankton_Algal_Type_Data_1975_-2016.csv", mode="wb")
-  }
-  
-  
+
   # Load and combine data ---------------------------------------------------
   
   Phyto<-read_csv("Data/Phytoplankton_Algal_Type_Data_1975_-2016.csv",
@@ -46,10 +34,10 @@ WCPhyter<-function(Download=F){
   
   # Add regions and summarise -------------------------------------------------------------
   
-  Stations<-read_csv("Data/wq_stations.csv",
-                     col_types = "cddc")%>%
-    select(Station=site, Latitude=lat, Longitude=long)%>%
-    drop_na()
+  Stations<-read_csv("Data/Master station key.csv",
+                     col_types = "cddcc")%>%
+    drop_na()%>%
+    filter(Project=="EMP")
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)

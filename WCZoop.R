@@ -11,26 +11,7 @@ WCZooper<-function(Download=F){
   require(readxl)
   require(lubridate)
   require(RColorBrewer)
-  
-  insert_minor <- function(major_labs, n_minor) {labs <- 
-    c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
-  labs[1:(length(labs)-n_minor)]}
- 
 
-# Download data -----------------------------------------------------------
-
-  
-  #CB
-  if (Download) {
-    download.file("ftp://ftp.wildlife.ca.gov/IEP_Zooplankton/1972-2018CBMatrix.xlsx", 
-                  "Data/1972-2018CBMatrix.xlsx", mode="wb")
-  }
-  
-  if (Download) {
-    download.file("ftp://ftp.wildlife.ca.gov/IEP_Zooplankton/1972-2018Pump Matrix.xlsx", 
-                  "Data/1972-2018Pump Matrix.xlsx", mode="wb")
-  }
-   
 
 # Load and combine data ---------------------------------------------------
 
@@ -83,12 +64,10 @@ WCZooper<-function(Download=F){
 
 # Add regions and summarise -------------------------------------------------------------
 
-  Stations<-read_csv("Data/zoop_stations.csv",
-                     col_types = "cdcdddddddd")%>%
-    mutate(Latitude=lat_deg+lat_min/60+lat_sec/3600,
-           Longitude=(long_deg+long_min/60+long_sec/3600)*(-1))%>%
-    select(Station=station, Latitude, Longitude)%>%
-    drop_na()
+  Stations<-read_csv("Data/Master station key.csv",
+                     col_types = "cddcc")%>%
+    drop_na()%>%
+    filter(Project=="EMP")
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)

@@ -1,4 +1,4 @@
-WCWQer<-function(Download=F){
+WCWQer<-function(){
   
   
   # Setup -------------------------------------------------------------------
@@ -13,22 +13,6 @@ WCWQer<-function(Download=F){
   require(RColorBrewer)
   
   
-  # Download data -----------------------------------------------------------
-  
-  if(Download){
-    #FMWT
-    temp <- tempfile()
-    download.file("ftp://ftp.dfg.ca.gov/TownetFallMidwaterTrawl/FMWT%20Data/FMWT%201967-2018%20Catch%20Matrix_updated.zip", temp)
-    unzip (temp, exdir="C:/Users/sbashevkin/Documents/Water-conditions-report/Data")
-    unlink(temp)
-    
-    #STN
-    download.file("ftp://ftp.dfg.ca.gov/TownetFallMidwaterTrawl/TNS%20MS%20Access%20Data/TNS%20data/Townet_Data_1959-2018.xlsx", "Data/Townet_Data_1959-2018.xlsx", mode="wb")
-    
-    #EDSM
-    download.file("https://portal.edirepository.org/nis/dataviewer?packageid=edi.415.1&entityid=7c76313e27c4ef4685e7fe016c1e4608", "Data/EDSM_20mm.csv", mode="wb")
-    download.file("https://portal.edirepository.org/nis/dataviewer?packageid=edi.415.1&entityid=93c01636cfc51919b8f363c7bfa829ca", "Data/EDSM_KDTR.csv", mode="wb")
-  }
   # Load and combine data ---------------------------------------------------
   
   FMWT<-read_excel("Data/FMWT 1967-2018 Catch Matrix_updated.xlsx", sheet="FlatFile", guess_max=30000)%>%
@@ -107,16 +91,12 @@ WCWQer<-function(Download=F){
   
   # Add regions and summarise -------------------------------------------------------------
   
-  Stations<-read_csv("Data/wq_stations.csv",
-                     col_types = "cddc")%>%
-    select(Station=site, Latitude=lat, Longitude=long)%>%
-    mutate(Source="EMP")%>%
-    bind_rows(read_excel("Data/Zoop_stations.xlsx", sheet="lat_long")%>%
-                filter(Project%in%c("FMWT", "STN"))%>%
-                rename(Source=Project),
-              EDSM%>%
+  Stations<-read_csv("Data/Master station key.csv",
+                     col_types = "cddcc")%>%
+    select(-StationID)%>%
+    bind_rows(EDSM%>%
                 select(Latitude, Longitude, Station, Source))%>%
-    filter(!is.na(Latitude) & !is.na(Longitude))
+    drop_na()
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)
@@ -146,7 +126,7 @@ WCWQer<-function(Download=F){
     left_join(Stations, by=c("Source", "Station"))%>%
     filter(!is.na(Region))%>% 
     group_by(Region, Year)%>%
-    summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T), Salinity=mean(Salinity, na.rm=T), N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
+    summarise(N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
     ungroup()
   
   WQsumTemp<-WQsum%>%
@@ -179,19 +159,19 @@ WCWQer<-function(Download=F){
       theme(panel.grid=element_blank(), strip.background = element_blank())
   }
   
-  TempShades<-expand.grid(Region=unique(WQsum$Region), Quality=c("Good", "OK", "Bad"))%>%
-    mutate(xmin=min(WQsum$MonthYear),
-           xmax=max(WQsum$MonthYear),
-           ymin=case_when(
-             Quality=="Good" ~ min(WQsum$Temperature),
-             Quality=="OK" ~ 20,
-             Quality=="Bad" ~ 26
-           ),
-           ymax=case_when(
-             Quality=="Good" ~ 20,
-             Quality=="OK" ~ 26,
-             Quality=="Bad" ~ max(WQsum$Temperature)
-           ))
+  #TempShades<-expand.grid(Region=unique(WQsum$Region), Quality=c("Good", "OK", "Bad"))%>%
+  #  mutate(xmin=min(WQsum$MonthYear),
+  #         xmax=max(WQsum$MonthYear),
+  #         ymin=case_when(
+  #           Quality=="Good" ~ min(WQsum$Temperature),
+  #           Quality=="OK" ~ 20,
+  #           Quality=="Bad" ~ 26
+  #         ),
+  #         ymax=case_when(
+  #           Quality=="Good" ~ 20,
+  #           Quality=="OK" ~ 26,
+  #           Quality=="Bad" ~ max(WQsum$Temperature)
+  #         ))
   
   pTemp<-ggplot()+
     geom_line(data=WQsumTemp, aes(x=Year, y=Temperature, color=Season))+
@@ -211,7 +191,6 @@ WCWQer<-function(Download=F){
   ###LOOKS LIKE MICRO ONLY MEASURED IN SUMMER?
   pMicro<-Microsum%>%
     filter(N_Microcystis>0)%>%
-    select(-N_Microcystis, -Temperature, -Chla, -Secchi_depth, -Salinity)%>%
     gather(key="Severity", value="Frequency", Microcystis1, Microcystis2, Microcystis3, Microcystis4, Microcystis5)%>%
     mutate(Severity=recode_factor(factor(Severity), "Microcystis1"="1", "Microcystis2"="2", "Microcystis3"="3", "Microcystis4"="4", "Microcystis5"="5", .ordered=T))%>%
     mutate(Severity=factor(Severity, levels=c(5,4,3,2,1)))%>%
@@ -227,7 +206,7 @@ WCWQer<-function(Download=F){
   
   plots<-list(Temperature=pTemp, Secchi=pSecchi, Chlorophyll=pChla, Salinity=pSal, Microcystis=pMicro)
   
-  #sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0(names(plots[x]), ".png"), device = "png", width = 7.5, height=5, units="in"))
+  sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=5, units="in"))
   
   return(plots)
   
