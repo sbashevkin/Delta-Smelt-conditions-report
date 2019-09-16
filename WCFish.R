@@ -28,7 +28,8 @@ WCFisher<-function(){
       read_excel("Data/SKT DS index.xlsx")%>%
         mutate(Source="SKT"),
       read_excel("Data/20mm DS index.xlsx")%>%
-        mutate(Source="20mm"))
+        mutate(Source="20mm"))%>%
+    filter(Year>=1991)
   
   
   # Add regions and summarise -------------------------------------------------------------
@@ -42,11 +43,12 @@ WCFisher<-function(){
     coord_cartesian(expand=0)+
     facet_grid(Source~., scales = "free_y")+
     scale_color_brewer(type="div", palette="RdYlBu", guide="none")+
-    scale_x_continuous(labels=insert_minor(seq(1960, 2020, by=10), 9), breaks = 1960:2020)+
+    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
     ylab("Index value")+
     xlab("Date")+
+    ggtitle("Delta smelt index values")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   p
   #ggsave(p, filename="Figures/Fish.png", device = "png", width = 7.5, height=5, units="in")
   return(p)

@@ -1,0 +1,122 @@
+---
+title: "Water conditions report"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = FALSE, fig.height=5, fig.width=7.5, fig.align="center")
+
+require(sf)
+require(rgdal)
+require(raster)
+require(tidyverse)
+require(readxl)
+require(lubridate)
+require(RColorBrewer)
+
+source("WCWQ.R")
+source("WCFish.R")
+source("WCZoop.R")
+source("WCPhyt.R")
+source("WCDayflow.R")
+source("WCBivalves.R")
+
+WC<-WCWQer()
+DF<-WCDayFlower()
+```
+
+# Abiotic drivers
+```{r}
+DF$Out
+```
+
+Delta outflow is an estimate of the volumen of water entering San Francisco Bay from the Delta. High Delta outflow is good for Delta Smelt because...
+
+Outflow was average in 2018 but much lower than the record flows in 2017.
+
+```{r}
+DF$X2
+```
+
+X2 is a measure of salinity intrusion into the delta. It is defined as the distance in kilometers from the golden gate where the salinity of the bottom water reaches 2. Lower X2 is better for Delta smelt because it means there is more low salinity habitat for them to occupy.....
+
+X2 was about average in 2018 but higher than the record low the previous year.
+
+```{r}
+WC$Temperature
+```
+
+Delta smelt are sensitive to high water temperatures and their sensitivity varies seasonally. More detail....
+
+Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
+
+```{r}
+WC$Salinity
+```
+
+Delta smelt prefer fresh water and are most abundant in salinities of 1-2 ppt, are rare in salinities higher than 6 ppt, and are not found in salinities above 14 ppt. A small percentage of Delta smelt are spawned in the brackish waters, but use freshwater during winter and spring months to spawn. 
+
+Salinity was average in 2018.
+
+```{r}
+WC$Secchi
+```
+
+Secchi depth is a measure of turbidity. Lower secchi depth indicates higher turbidity, which is preferred by Delta Smelt. Delta Smelt evolved in the turbid waters of the Delta and use the turbidity to hide from predators and detect their prey or something.
+
+Secchi depth was above average in most regions in the Delta in 2018, reflecting a general trend of decreasing turbidity over the past few years.
+
+# Biotic drivers
+
+```{r}
+WC$Chlorophyll
+```
+
+Chlorophyll is a measure of primary productivity at the base of the Delta food web. Higher chlorophyll indicates more food is available for zooplankton which are important prey for many fish including Delta Smelt. Chlorophyll levels above 10 μg/L are regarded as the minimum to sustain good zooplankton growth and are shown in green. 
+
+Chlorophyll levels were low in 2018.
+
+```{r}
+WC$Microcystis
+```
+
+Microcystis is a toxin-producing cyanobacteria harmful to human and animal health. Microcystis is measured on a qualitative scale from 1 (none detected) to 5 (high concentrations).
+
+High concentration microcystis blooms were detected in 2018 in the Lower San Joaquin and Southern Delta regions. 
+
+```{r}
+WCPhyter()
+```
+
+Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for many fishes such as Delta Smelt.
+
+Something about phytoplankton concentrations. 
+
+```{r}
+WCZooper()
+```
+
+Zooplankton are important food for Delta Smelt, which feed primarily on these taxa
+
+Zooplankton biomass was average in 2018 except in the Southern Delta and Suisin regions where it was above average.
+```{r}
+WCBivalver()
+```
+
+Invasive bivalves (clams) have been responsible for drastic declines in phytoplankton and zooplankton biomass in the Delta, reducing the amount and quality of food available for fishes.
+
+Bivalve abundances in 2018 were low or reduced relative to recent years in the Lower San Joaquin, Southern Delta, and Suisin Bay/Marsh but very high in the Lower Sacramento and Western Delta.
+
+# Delta Smelt
+
+```{r}
+WCFisher()
+```
+
+Delta smelt abundance is measured by 4 IEP surveys that target different life stages. Details here.
+
+All abundance indices in 2018 were low or impossible to calculate due to very low catch.

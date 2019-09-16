@@ -67,7 +67,7 @@ WCZooper<-function(Download=F){
   Stations<-read_csv("Data/Master station key.csv",
                      col_types = "cddcc")%>%
     drop_na()%>%
-    filter(Project=="EMP")
+    filter(Source=="EMP")
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)
@@ -89,24 +89,38 @@ WCZooper<-function(Download=F){
     filter(!is.na(Region))%>% 
     group_by(Region, Year, Taxa)%>%
     summarise(BPUE=mean(BPUE, na.rm=T))%>%
-    ungroup()
+    ungroup()%>%
+    filter(Year>=1991)%>%
+    droplevels()%>%
+    mutate(missing="na")%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Zoopmissing<-Zoopsum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Zoopsum<-Zoopsum%>%
+    filter(is.na(missing))%>%
+    select(-missing)%>%
+    mutate(Taxa=factor(Taxa, levels=c("Calanoida", "Cyclopoida", "Cladocera", "Mysida")))
   
 
 # Plot --------------------------------------------------------------------
 
-  p<-Zoopsum%>%
-    filter(Year>1991)%>%
-    mutate(Taxa=factor(Taxa, levels=c("Calanoida", "Cyclopoida", "Cladocera", "Mysida")))%>%
-    ggplot(aes(x=Year, y=BPUE, fill=Taxa))+
-    geom_area()+
+  p<-ggplot()+
+    geom_bar(data=Zoopsum, aes(x=Year, y=BPUE, fill=Taxa), stat="identity")+
+    geom_vline(data=Zoopmissing, aes(xintercept=Year), linetype=2)+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
-    scale_fill_manual(values=brewer.pal(4, "BrBG"))+
+    scale_fill_brewer(type="div", palette="BrBG")+
     coord_cartesian(expand=0)+
     xlab("Date")+
+    ggtitle("Zooplankton")+
     facet_wrap(~Region)+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
-  p
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.12), legend.text=element_text(size=8), legend.background=element_rect(fill="white", color="black"))
+  ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=5, units="in")
+  
   return(p)
   
   }

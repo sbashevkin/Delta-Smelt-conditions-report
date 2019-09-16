@@ -45,7 +45,7 @@ WCBivalver<-function(Download=F){
   
   #Add regions and lat/long to zoop dataset
   Bivsum<-Biv%>%
-    filter(Year>1991)%>%
+    filter(Year>=1991)%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
     group_by(Region, Year, Taxa)%>%
@@ -77,8 +77,9 @@ WCBivalver<-function(Download=F){
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
+    ggtitle("Invasive bivalve abundance")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   p
   return(p)
   

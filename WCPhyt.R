@@ -37,7 +37,7 @@ WCPhyter<-function(Download=F){
   Stations<-read_csv("Data/Master station key.csv",
                      col_types = "cddcc")%>%
     drop_na()%>%
-    filter(Project=="EMP")
+    filter(Source=="EMP")
   
   #Load delta regions shapefile from Morgan
   Deltaregions<-st_read("Data/Delta regions", quiet=T)
@@ -60,7 +60,7 @@ WCPhyter<-function(Download=F){
     group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()%>%
-    filter(Year>1991)%>%
+    filter(Year>=1991)%>%
     mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Other flagellates", "Other taxa")),
            missing="na",
            Region=as.character(Region))%>%
@@ -85,14 +85,15 @@ WCPhyter<-function(Download=F){
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     geom_label(data=Peak, aes(x=Year-7, y=35000, label=label), size=3)+
     #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    scale_fill_manual(values=brewer.pal(7, "BrBG"))+
+    scale_fill_manual(values=brewer.pal(7, "BrBG"), guide=guide_legend(keyheight=0.8))+
     xlab("Date")+
     coord_cartesian(expand=0, ylim=c(0,40000))+
     facet_wrap(~Region)+
+    ggtitle("Phytoplankton")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.1, 0.25), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   
-  p
+  #ggsave(p, filename="Figures/Phytoplankton.png", device = "png", width = 7.5, height=5, units="in")
   
   return(p)
   

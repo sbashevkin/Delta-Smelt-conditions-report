@@ -20,7 +20,7 @@ WCDayFlower<-function(Download=F){
     bind_rows(read_csv("Data/Dayflow1984 1996.csv", col_types = "cddcddddddddddddddddddddddddd")%>%
                 mutate(DATE=parse_date_time(DATE, "%d-%b-%y"))%>%
                 select(Date=DATE, OUT))%>%
-    filter(year(Date)>1991)%>%
+    filter(year(Date)>=1991)%>%
     mutate(MonthYear=floor_date(Date, unit = "month"))%>%
     group_by(MonthYear)%>%
     summarise(OUT=mean(OUT, na.rm=T), X2=mean(X2, na.rm=T))
@@ -30,19 +30,21 @@ WCDayFlower<-function(Download=F){
   
   p<-list()
   p$X2<-ggplot()+
-    geom_line(data=DF, aes(x=MonthYear, y=X2))+
+    geom_line(data=DF, aes(x=MonthYear, y=X2), color="dodgerblue4")+
     coord_cartesian(expand=0)+
     ylab("X2 (km)")+
     xlab("Date")+
+    ggtitle("X2")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   
   p$Out<-ggplot()+
-    geom_line(data=DF, aes(x=MonthYear, y=OUT))+
+    geom_line(data=DF, aes(x=MonthYear, y=OUT), color="dodgerblue4")+
     coord_cartesian(expand=0)+
     ylab(bquote("Delta"~outflow~ft^3*"/s"))+
     xlab("Date")+
+    ggtitle("Delta outflow")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank())
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   return(p)
 }
