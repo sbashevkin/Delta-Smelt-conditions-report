@@ -23,10 +23,12 @@ WCPhyter<-function(Download=F){
                   col_types = "ccddddddddddddddddddd")%>%
     rename(Date=SampleDate, Station=StationCode)%>%
     mutate(Date=parse_date_time(Date, "mdy"))%>%
+    bind_rows(read_excel("Data/Phytoplankton 2017.xlsx")%>%
+                rename(Station=`Station Code`, Cryptophytes=Cryptomonads))%>%
     gather(key="Taxa", value="CPUE", -Date, -Station)%>%
     mutate(Taxa=case_when(Taxa%in%c("Centric Diatoms", "Pennate Diatoms") ~ "Diatoms",
                           Taxa%in%c("Other flagellate", "Unknown Flagellates") ~ "Other flagellates",
-                          Taxa%in%c("Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates") ~ Taxa,
+                          Taxa%in%c("Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Cyanobacteria") ~ Taxa,
                           TRUE ~ "Other taxa"))%>%
     mutate(Year=year(Date),
            MonthYear=floor_date(Date, unit = "month"))
@@ -57,11 +59,14 @@ WCPhyter<-function(Download=F){
   Phytosum<-Phyto%>%
     left_join(Stations, by="Station")%>%
     filter(!is.na(Region))%>% 
+    group_by(Taxa, Region, Year, Date, Station)%>%
+    summarise(CPUE=sum(CPUE, na.rm=T))%>%
+    ungroup()%>%
     group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()%>%
     filter(Year>=1991)%>%
-    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Other flagellates", "Other taxa")),
+    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Green Algae", "Cryptophytes", "Chrysophytes", "Cyanobacteria", "Dinoflagellates", "Other flagellates", "Other taxa")),
            missing="na",
            Region=as.character(Region))%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
@@ -75,26 +80,38 @@ WCPhyter<-function(Download=F){
     filter(is.na(missing))%>%
     select(-missing)
   
-  Peak<-tibble(Region=Phytosum$Region[which.max(Phytosum$CPUE)], Year=Phytosum$Year[which.max(Phytosum$CPUE)], label=paste0("Peak CPUE: ", format(round(max(Phytosum$CPUE)), big.mark=",")))
+  Peak<-tibble(Region=filter(Phytosum, Taxa!="Cyanobacteria")$Region[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], Year=filter(Phytosum, Taxa!="Cyanobacteria")$Year[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], label=paste0("Peak CPUE: ", format(round(max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)), big.mark=",")))
   
   
   # Plot --------------------------------------------------------------------
   
-  p<-ggplot()+
-    geom_bar(data=Phytosum, aes(x=Year, y=CPUE, fill=Taxa), stat="identity")+
+  pphyto<-ggplot()+
+    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria"), aes(x=Year, y=CPUE, fill=Taxa), stat="identity")+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     geom_label(data=Peak, aes(x=Year-7, y=35000, label=label), size=3)+
     #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    scale_fill_manual(values=brewer.pal(7, "BrBG"), guide=guide_legend(keyheight=0.8))+
+    scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(keyheight=0.8), direction=-1)+
     xlab("Date")+
-    coord_cartesian(expand=0, ylim=c(0,40000))+
+    coord_cartesian(expand=0, ylim=c(0,62000))+
+    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     facet_wrap(~Region)+
     ggtitle("Phytoplankton")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.1, 0.25), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
-  
+
+  pcyano<-ggplot()+
+    geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria"), aes(x=Year, y=CPUE), fill="cyan4", stat="identity")+
+    geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
+    xlab("Date")+
+    coord_cartesian(expand=0)+
+    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    facet_wrap(~Region)+
+    ggtitle("Cyanobacteria")+
+    theme_bw()+
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+
   #ggsave(p, filename="Figures/Phytoplankton.png", device = "png", width = 7.5, height=5, units="in")
   
-  return(p)
+  return(list(Phytoplankton=pphyto, Cyanobacteria=pcyano))
   
 }

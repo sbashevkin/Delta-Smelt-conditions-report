@@ -1,9 +1,9 @@
 ---
 title: "Water conditions report"
 output:
+  html_document: default
   pdf_document: 
     latex_engine: xelatex
-  html_document: default
 editor_options:
   chunk_output_type: console
 ---
@@ -28,6 +28,7 @@ source("WCBivalves.R")
 
 WC<-WCWQer()
 DF<-WCDayFlower()
+PH<-WCPhyter()
 ```
 
 # Abiotic drivers
@@ -36,7 +37,7 @@ DF<-WCDayFlower()
 DF$Out
 ```
 
-Delta outflow is an estimate of the volumen of water entering San Francisco Bay from the Delta. High Delta outflow is good for Delta Smelt because...
+Delta outflow is an estimate of the volume of water entering San Francisco Bay from the Delta. High Delta outflow is good for Delta Smelt because...
 
 Outflow was average in 2018 but much lower than the record flows in 2017.
 
@@ -91,12 +92,20 @@ Microcystis is a toxin-producing cyanobacteria harmful to human and animal healt
 High concentration microcystis blooms were detected in 2018 in the Lower San Joaquin and Southern Delta regions. 
 
 ```{r}
-WCPhyter()
+PH$Phytoplankton
 ```
 
 Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for many fishes such as Delta Smelt.
 
 Something about phytoplankton concentrations. 
+
+```{r}
+PH$Cyanobacteria
+```
+
+Cyanobacteria are phytoplankton that can produce toxins such as microcystis. 
+
+Cyanobacteria have increasd in the past few years to record 2018 concentrations.
 
 ```{r}
 WCZooper()
