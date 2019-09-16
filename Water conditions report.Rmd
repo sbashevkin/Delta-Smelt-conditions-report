@@ -1,7 +1,8 @@
 ---
 title: "Water conditions report"
 output:
-  pdf_document: default
+  pdf_document: 
+    latex_engine: xelatex
   html_document: default
 editor_options:
   chunk_output_type: console
@@ -30,6 +31,7 @@ DF<-WCDayFlower()
 ```
 
 # Abiotic drivers
+
 ```{r}
 DF$Out
 ```
@@ -103,6 +105,7 @@ WCZooper()
 Zooplankton are important food for Delta Smelt, which feed primarily on these taxa
 
 Zooplankton biomass was average in 2018 except in the Southern Delta and Suisin regions where it was above average.
+
 ```{r}
 WCBivalver()
 ```
