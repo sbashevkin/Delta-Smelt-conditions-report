@@ -31,13 +31,25 @@ WCFisher<-function(){
         mutate(Source="20mm"))%>%
     filter(Year>=1991)
   
+  EDSM<-read_csv("Data/edsm_abund_estimates_2019-09-17.csv")%>%
+    mutate(Stratum=recode(Stratum, "Suisun Bay Marsh"="Suisun Bay/Marsh", "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel", "Suisun Bay"="Suisun Bay/Marsh", "Suisun Marsh"="Suisun Bay/Marsh"),
+           Date=WeekStartDate+ceiling((WeekEndDate-WeekStartDate)/2))%>%
+    filter(Stratum%in%c("Cache Slough/Liberty Island", "Lower Sacramento", "Lower San Joaquin", "Sac Deep Water Shipping Channel", "Southern Delta", "Suisun Bay/Marsh", "Upper Sacramento", "Western Delta"))%>%
+    select(Region=Stratum, Date, Abundance=nHat, lowCI, uppCI)%>%
+    mutate(Abundance_l=log10(Abundance+1),
+           lowCI_l=log10(lowCI+1),
+           uppCI_l=log10(uppCI+1))%>%
+    filter(!(Region%in%c("Upper Sacramento", "Southern Delta"))) #No DS ever caught in these regions so removing them
+  
   
   # Add regions and summarise -------------------------------------------------------------
   
   
   # Plot --------------------------------------------------------------------
   
-  p<-ggplot(IEP_Indices, aes(x=Year, y=Index, color=Source))+
+  p<-list()
+  
+  p$IEP<-ggplot(IEP_Indices, aes(x=Year, y=Index, color=Source))+
     geom_line(size=1)+
     geom_point()+
     coord_cartesian(expand=0)+
@@ -46,11 +58,26 @@ WCFisher<-function(){
     scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
     ylab("Index value")+
     xlab("Date")+
-    ggtitle("Delta smelt index values")+
+    ggtitle("IEP Delta smelt index values")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
-  p
-  #ggsave(p, filename="Figures/Fish.png", device = "png", width = 7.5, height=5, units="in")
+  
+  p$EDSM<-ggplot(data=EDSM, aes(x=Date, y=Abundance_l))+
+    geom_point(color="darkorchid4")+
+    geom_errorbar(aes(ymin=lowCI_l, ymax=uppCI_l), alpha=0.6)+
+    coord_cartesian(expand=0)+
+    facet_wrap(~Region)+
+    ylab("log(Delta Smelt abundance+1)")+
+    xlab("Date")+
+    ggtitle("EDSM Delta Smelt Abundance")+
+    theme_bw()+
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+  
+  
+  
+  
+  ggsave(p$IEP, filename="Figures/IEP Fish.png", device = "png", width = 7.5, height=4, units="in")
+  ggsave(p$EDSM, filename="Figures/EDSM Fish.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
   
 }

@@ -41,10 +41,13 @@ WCDayFlower<-function(Download=F){
   p$Out<-ggplot()+
     geom_line(data=DF, aes(x=MonthYear, y=OUT), color="dodgerblue4")+
     coord_cartesian(expand=0)+
-    ylab(bquote("Delta"~outflow~ft^3*"/s"))+
+    ylab(bquote("Delta"~outflow~"("*ft^3*"/s)"))+
     xlab("Date")+
     ggtitle("Delta outflow")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+  
+  ggsave(p$Out, filename="Figures/Outflow.png", device = "png", width = 7.5, height=4, units="in")
+  ggsave(p$X2, filename="Figures/X2.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
 }

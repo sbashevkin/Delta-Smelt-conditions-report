@@ -39,12 +39,26 @@ WQ<-read_csv("Data/wq_stations.csv")%>%
          StationID=paste(Source, Station))%>%
   drop_na()
 
+#EZ stations
+
+EZ<-read_excel("Data/EMP WQ Combined_2000-2018.xlsx", na=c("N/A", "<R.L.", "Too dark"), col_types = c(rep("text", 3), "date", rep("text", 37)))%>%
+  select(Station=`Station Name`, Date, Latitude=`North Latitude Degrees (d.dd)`, Longitude=`West Longitude Degrees (d.dd)`)%>%
+  mutate(Latitude=parse_double(Latitude),
+         Longitude=parse_double(Longitude))%>%
+  mutate(Station=paste(Station, Date),
+         Source="EMP")%>%
+  select(Station, Latitude, Longitude, Source)%>%
+  mutate(StationID=paste(Source, Station))%>%
+  drop_na()
+
 Stations<-bind_rows(
-  FMWT, 
-  STN, 
-  Zoopxl%>%
-    filter(!(StationID%in%unique(FMWT$StationID)) & !(StationID%in%unique(STN$StationID))),
+  Zoopxl,
+  FMWT%>%
+    filter(!(StationID%in%unique(Zoopxl$StationID))), 
+  STN%>%
+    filter(!(StationID%in%unique(Zoopxl$StationID))), 
   WQ%>%
-    filter(!(StationID%in%unique(Zoopxl$StationID))))
+    filter(!(StationID%in%unique(Zoopxl$StationID))),
+  EZ)
 
 write_csv(Stations, "Data/Master station key.csv")

@@ -65,7 +65,7 @@ WCZooper<-function(Download=F){
 # Add regions and summarise -------------------------------------------------------------
 
   Stations<-read_csv("Data/Master station key.csv",
-                     col_types = "cddcc")%>%
+                     col_types =  "ccddc")%>%
     drop_na()%>%
     filter(Source=="EMP")
   
@@ -112,14 +112,14 @@ WCZooper<-function(Download=F){
     geom_bar(data=Zoopsum, aes(x=Year, y=BPUE, fill=Taxa), stat="identity")+
     geom_vline(data=Zoopmissing, aes(xintercept=Year), linetype=2)+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
-    scale_fill_brewer(type="div", palette="BrBG")+
+    scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(title=NULL, keyheight=0.8))+
     coord_cartesian(expand=0)+
     xlab("Date")+
     ggtitle("Zooplankton")+
     facet_wrap(~Region)+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.12), legend.text=element_text(size=8), legend.background=element_rect(fill="white", color="black"))
-  ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=5, units="in")
+  ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=4, units="in")
   
   return(p)
   

@@ -21,8 +21,9 @@ WCWQer<-function(){
            Secchi=Secchi*100,
            Microcystis=if_else(Microcystis==6, 2, Microcystis))
   
-  STN<-read_excel("Data/Townet_Data_1959-2018.xlsx", sheet="CatchPerStation", guess_max=10000)%>%
-    select(Date=SampleDate, Station=StationCode, Secchi, Temperature=`TemperatureTop`, Conductivity=`ConductivityTop`)%>%
+  STN<-read_excel("Data/STN Sample.xlsx", guess_max=10000)%>%
+    select(Date=SampleDate, Station=StationCode, Secchi, Temperature=`TemperatureTop`, Conductivity=`ConductivityTop`, Microcystis
+    )%>%
     mutate(Source="TNS")
   
   EDSM<-read_csv("Data/EDSM_20mm.csv", guess_max=9000)%>%
@@ -57,42 +58,30 @@ WCWQer<-function(){
                 summarise(Value=mean(Value, na.rm=T))%>%
                 ungroup())%>%
     spread(key=Parameter, value=Value)%>%
-    rename(Chla=`Chlorophyll a`, Secchi_depth=`Secchi Depth`, Conductivity=`Conductance (EC)`)%>%
-    bind_rows(sapply(Widefiles, function(x) read_excel(x)%>%
-                       select(Station=`Station Name`, Date=`Sample Date`, Chla=starts_with("Chlorophyll a"), Notes=`Field Notes`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=starts_with("Water Temperature"), Conductivity=starts_with("Specific Conductance"))%>%
-                       {if(is.character(.$Chla)){
-                         mutate(., Chla=parse_double(ifelse(Chla%in%c("<0.05", "<0.5"), 0, Chla), na = c("", "NA", "N/A", "<R.L.")))
-                       } else{
-                         .
-                       }}%>%
-                       {if(is.character(.$Secchi_depth)){
-                         mutate(., Secchi_depth=parse_double(Secchi_depth, na = c("", "NA", "N/A", "Too dark")))
-                       } else{
-                         .
-                       }}%>%
-                       {if(is.character(.$Temperature)){
-                         mutate(., Temperature=parse_double(Temperature, na = c("", "NA", "N/A")))
-                       } else{
-                         .
-                       }}%>%
-                       {if(is.character(.$Conductivity)){
-                         mutate(., Conductivity=parse_double(Conductivity, na = c("", "NA", "N/A")))
-                       } else{
-                         .
-                       }}, 
-                     simplify=FALSE) %>% 
-                bind_rows())%>%
+    rename(Chlorophyll=`Chlorophyll a`, Secchi_depth=`Secchi Depth`, Conductivity=`Conductance (EC)`)%>%
+    bind_rows(read_excel("Data/EMP WQ Combined_2000-2018.xlsx", na=c("N/A", "<R.L.", "Too dark"), col_types = c(rep("text", 3), "date", rep("text", 37)))%>%
+                select(Station=`Station Name`, Date, Chlorophyll=starts_with("Chlorophyll"), Latitude=`North Latitude Degrees (d.dd)`, Longitude=`West Longitude Degrees (d.dd)`, Microcystis=`Microcystis aeruginosa`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=starts_with("Water Temperature"), Conductivity=starts_with("Specific Conductance"))%>%
+                mutate(Chlorophyll=parse_double(ifelse(Chlorophyll%in%c("<0.05", "<0.5"), 0, Chlorophyll)),
+                       Latitude=parse_double(Latitude),
+                       Longitude=parse_double(Longitude),
+                       Microcystis=parse_double(Microcystis),
+                       Secchi_depth=parse_double(Secchi_depth),
+                       Temperature=parse_double(Temperature),
+                       Conductivity=parse_double(Conductivity),
+                       Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))%>%
+                mutate(Microcystis=round(Microcystis))%>% #EMP has some 2.5 and 3.5 values
+                select(-Latitude, -Longitude))%>%
     mutate(Source="EMP")%>%
     bind_rows(FMWT, EDSM%>%
                 select(-Latitude, -Longitude))%>%
     mutate(MonthYear=floor_date(Date, unit = "month"),
            Year=year(Date),
            Salinity=((0.36966/(((Conductivity*0.001)^(-1.07))-0.00074))*1.28156))
-  
-  # Add regions and summarise -------------------------------------------------------------
+    
+    # Add regions and summarise -------------------------------------------------------------
   
   Stations<-read_csv("Data/Master station key.csv",
-                     col_types = "cddcc")%>%
+                     col_types = "ccddc")%>%
     select(-StationID)%>%
     bind_rows(EDSM%>%
                 select(Latitude, Longitude, Station, Source))%>%
@@ -118,7 +107,7 @@ WCWQer<-function(){
     left_join(Stations, by=c("Source", "Station"))%>%
     filter(!is.na(Region))%>% 
     group_by(Region, Year, MonthYear)%>%
-    summarise(Temperature=mean(Temperature, na.rm=T), Chla=mean(Chla, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T), Salinity=mean(Salinity, na.rm=T), N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
+    summarise(Temperature=mean(Temperature, na.rm=T), Chlorophyll=mean(Chlorophyll, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T), Salinity=mean(Salinity, na.rm=T), N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
     ungroup()
   
   Microsum<-WQ%>%
@@ -147,18 +136,19 @@ WCWQer<-function(){
   WQsumTemp<-WQsum%>%
     mutate(Season=ifelse(month(MonthYear)<7, "Winter/Spring", "Summer/Fall"))%>%
     group_by(Season, Year, Region)%>%
-    summarise(Temperature=max(Temperature))
+    summarise(Temperature=max(Temperature))%>%
+    complete(Year, Region, Season)
   
   WQsalrange<-WQsum%>%
     filter(!is.na(Salinity))%>%
     group_by(Region)%>%
     summarise(Salrange=paste0("min: ", round(min(Salinity), 2), ", max: ", round(max(Salinity), 2)))
   
-  WQchlrange<-tibble(xmin=min(WQsum$MonthYear), xmax=max(WQsum$MonthYear), Region=unique(as.character(filter(WQsum, !is.na(Chla))$Region)))
+  WQchlrange<-tibble(xmin=min(WQsum$MonthYear), xmax=max(WQsum$MonthYear), Region=unique(as.character(filter(WQsum, !is.na(Chlorophyll))$Region)))
   WQchlrange<-WQchlrange%>%
     mutate(ymin=0, ymax=10, Quality="Bad")%>%
     bind_rows(WQchlrange%>%
-                mutate(ymin=10, ymax=max(WQsum$Chla, na.rm=T), Quality="Good"))  
+                mutate(ymin=10, ymax=max(WQsum$Chlorophyll, na.rm=T), Quality="Good"))  
   
   # Plot --------------------------------------------------------------------
   
@@ -193,6 +183,7 @@ WCWQer<-function(){
     geom_line(data=WQsumTemp, aes(x=Year, y=Temperature, color=Season))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
+    scale_color_discrete(guide=guide_legend(title=NULL))+
     ylab(bquote(Maximum~monthly~mean~temperature~"("*degree*C*")"))+
     ggtitle("Temperature")+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
@@ -202,7 +193,7 @@ WCWQer<-function(){
   
   
   pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)", "Secchi depth")
-  pChla<-plotWQ(Chla, bquote(Chlorophyll~a~"("*mu*g*"/L)"), "Chlorophyll")+geom_rect(data=WQchlrange, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3)+scale_fill_manual(guide="none", values=c("#fc8d62", "#66c2a5"))
+  pChla<-plotWQ(Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), "Chlorophyll")+geom_rect(data=WQchlrange, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3)+scale_fill_manual(guide="none", values=c("#fc8d62", "#66c2a5"))
   
   pSal<-plotWQ(Salinity, "Salinity", "Salinity")+geom_label(data=WQsalrange, aes(x=as.POSIXct("2000-01-01"), y=21, label=Salrange), alpha=0.5, size=2.5)
   
@@ -210,18 +201,18 @@ WCWQer<-function(){
   pMicro<-ggplot()+
     geom_bar(data=Microsum, aes(x=Year, y=Frequency, fill=Severity), stat="identity")+
     geom_vline(data=Micromissing, aes(xintercept=Year), linetype=2)+
-    scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(reverse=T, keyheight=0.8))+
+    scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(keyheight=0.8, title=NULL))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     ylab("Relative frequency")+
     xlab("Date")+
     ggtitle("Microcystis")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.83, 0.15), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.83, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   
   plots<-list(Temperature=pTemp, Secchi=pSecchi, Salinity=pSal, Chlorophyll=pChla, Microcystis=pMicro)
   
-  #sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=5, units="in"))
+  sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=4, units="in"))
   
   return(plots)
   

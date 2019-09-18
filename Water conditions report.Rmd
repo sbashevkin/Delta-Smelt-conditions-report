@@ -1,15 +1,15 @@
 ---
 title: "Water conditions report"
 output:
-  html_document: default
   pdf_document: 
     latex_engine: xelatex
+  html_document: default
 editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F, warning = FALSE, fig.height=5, fig.width=7.5, fig.align="center")
+knitr::opts_chunk$set(echo = F, warning = FALSE, fig.height=4, fig.width=7.5, fig.align="center")
 
 require(sf)
 require(rgdal)
@@ -29,23 +29,24 @@ source("WCBivalves.R")
 WC<-WCWQer()
 DF<-WCDayFlower()
 PH<-WCPhyter()
+FISH<-WCFisher()
 ```
 
 # Abiotic drivers
 
-```{r}
+```{r Outflow, fig.height=3.5}
 DF$Out
 ```
 
-Delta outflow is an estimate of the volume of water entering San Francisco Bay from the Delta. High Delta outflow is good for Delta Smelt because...
+High Delta outflow into the San Francisco Bay is good for Delta Smelt because...
 
 Outflow was average in 2018 but much lower than the record flows in 2017.
 
-```{r}
+```{r X2, fig.height=3.5}
 DF$X2
 ```
 
-X2 is a measure of salinity intrusion into the delta. It is defined as the distance in kilometers from the golden gate where the salinity of the bottom water reaches 2. Lower X2 is better for Delta smelt because it means there is more low salinity habitat for them to occupy.....
+X2 is a measure of salinity intrusion defined as the distance from the golden gate to where the salinity of the bottom water reaches 2. Lower X2 is better for Delta smelt because it means there is more low salinity habitat for them to occupy.....
 
 X2 was about average in 2018 but higher than the record low the previous year.
 
@@ -69,9 +70,11 @@ Salinity was average in 2018.
 WC$Secchi
 ```
 
-Secchi depth is a measure of turbidity. Lower secchi depth indicates higher turbidity, which is preferred by Delta Smelt. Delta Smelt evolved in the turbid waters of the Delta and use the turbidity to hide from predators and detect their prey or something.
+Secchi depth is a measure of turbidity. Lower secchi depth indicates higher turbidity, which is preferred by Delta Smelt.
 
 Secchi depth was above average in most regions in the Delta in 2018, reflecting a general trend of decreasing turbidity over the past few years.
+
+\pagebreak
 
 # Biotic drivers
 
@@ -79,17 +82,25 @@ Secchi depth was above average in most regions in the Delta in 2018, reflecting 
 WC$Chlorophyll
 ```
 
-Chlorophyll is a measure of primary productivity at the base of the Delta food web. Higher chlorophyll indicates more food is available for zooplankton which are important prey for many fish including Delta Smelt. Chlorophyll levels above 10 μg/L are regarded as the minimum to sustain good zooplankton growth and are shown in green. 
+Chlorophyll is a measure of productivity at the base of the Delta food web. Higher chlorophyll indicates more food is available for zooplankton which are important prey for many fish including Delta Smelt. Chlorophyll levels above 10 μg/L (green) are required to sustain zooplankton growth.
 
 Chlorophyll levels were low in 2018.
+
+```{r}
+PH$Cyanobacteria
+```
+
+Cyanobacteria are phytoplankton that can produce toxins such as microcystis. 
+
+Cyanobacteria have increased in the past few years to record 2018 concentrations.
 
 ```{r}
 WC$Microcystis
 ```
 
-Microcystis is a toxin-producing cyanobacteria harmful to human and animal health. Microcystis is measured on a qualitative scale from 1 (none detected) to 5 (high concentrations).
+Microcystis is a toxin-producing cyanobacteria harmful to human and animal health.
 
-High concentration microcystis blooms were detected in 2018 in the Lower San Joaquin and Southern Delta regions. 
+High concentration microcystis blooms were detected in 2018 in the Lower San Joaquin and Southern Delta regions.
 
 ```{r}
 PH$Phytoplankton
@@ -98,14 +109,6 @@ PH$Phytoplankton
 Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for many fishes such as Delta Smelt.
 
 Something about phytoplankton concentrations. 
-
-```{r}
-PH$Cyanobacteria
-```
-
-Cyanobacteria are phytoplankton that can produce toxins such as microcystis. 
-
-Cyanobacteria have increasd in the past few years to record 2018 concentrations.
 
 ```{r}
 WCZooper()
@@ -119,16 +122,24 @@ Zooplankton biomass was average in 2018 except in the Southern Delta and Suisin 
 WCBivalver()
 ```
 
-Invasive bivalves (clams) have been responsible for drastic declines in phytoplankton and zooplankton biomass in the Delta, reducing the amount and quality of food available for fishes.
+Invasive bivalves (clams) have been responsible for drastic declines in phytoplankton and zooplankton biomass in the Delta, reducing the amount of food available for fishes.
 
 Bivalve abundances in 2018 were low or reduced relative to recent years in the Lower San Joaquin, Southern Delta, and Suisin Bay/Marsh but very high in the Lower Sacramento and Western Delta.
 
 # Delta Smelt
 
 ```{r}
-WCFisher()
+FISH$IEP
 ```
 
 Delta smelt abundance is measured by 4 IEP surveys that target different life stages. Details here.
 
 All abundance indices in 2018 were low or impossible to calculate due to very low catch.
+
+```{r}
+FISH$EDSM
+```
+
+EDSM calculates abundance estimates with confidence intervals every week. __*Note that the y-axis is log transformed (i.e. 1=10, 2=100, 3=1000, etc.) and the x axis starts in mid 2017.*__
+
+EDSM also documents a general decline in Delta Smelt across all regions (since mid 2017).

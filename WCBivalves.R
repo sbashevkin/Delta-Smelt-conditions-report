@@ -74,13 +74,14 @@ WCBivalver<-function(Download=F){
     geom_area()+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     xlab("Date")+
-    scale_fill_manual(values=c("#d8b365", "#5ab4ac"))+
+    scale_fill_manual(values=c("#d8b365", "#5ab4ac"), guide=guide_legend(title=NULL))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     ggtitle("Invasive bivalve abundance")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
-  p
+  
+  ggsave(p, filename="Figures/Bivalves.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
   
 }
