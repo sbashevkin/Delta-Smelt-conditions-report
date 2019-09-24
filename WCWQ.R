@@ -77,8 +77,8 @@ WCWQer<-function(){
     mutate(MonthYear=floor_date(Date, unit = "month"),
            Year=year(Date),
            Salinity=((0.36966/(((Conductivity*0.001)^(-1.07))-0.00074))*1.28156))
-    
-    # Add regions and summarise -------------------------------------------------------------
+  
+  # Add regions and summarise -------------------------------------------------------------
   
   Stations<-read_csv("Data/Master station key.csv",
                      col_types = "ccddc")%>%
@@ -135,17 +135,22 @@ WCWQer<-function(){
   
   WQsumTemp<-WQsum%>%
     mutate(Month=month(MonthYear))%>%
-    #mutate(Season=ifelse(month(MonthYear)<7, "Winter/Spring", "Summer/Fall"))%>%
     group_by(Month, Year, Region)%>%
     summarise(Temperature=mean(Temperature, na.rm=T))%>%
     ungroup()%>%
     complete(Month, Year, Region)%>%
-    group_by(Year, Region)%>%
-    summarise(Temperature_20=sum(Temperature>20), Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature=median(Temperature))%>%
-    group_by(Region)%>%
-    mutate(N=length(which(!is.na(Temperature_max))))%>%
-    filter(N>0)%>%
-    droplevels()
+    mutate(Season=case_when(
+      Month%in%c(12,1,2,3) ~ "Adult\n(winter)",
+      Month%in%c(4,5,6) ~ "Larvae\n(spring)",
+      Month%in%c(7,8,9,10,11) ~ "Juvenile\n(summer/fall)"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    group_by(Year, Season, Region)%>%
+    summarise(Temperature_20=sum(Temperature>20), Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature))%>%
+    ungroup()%>%
+    filter(!(Region%in%c("Cache Slough/Liberty Island", "Sac Deep Water Shipping Channel")))%>%
+    droplevels()%>%
+    mutate(Season=factor(Season, levels=c("Larvae\n(spring)", "Juvenile\n(summer/fall)", "Adult\n(winter)")))
   
   WQsalrange<-WQsum%>%
     filter(!is.na(Salinity))%>%
@@ -188,20 +193,18 @@ WCWQer<-function(){
   #         ))
   
   pTemp<-ggplot(data=WQsumTemp, aes(x=Year))+
-    geom_line(aes(y=Temperature), color="darkorchid4")+
-    geom_line(aes(y=Temperature_max), color="firebrick3")+
-    geom_line(aes(y=Temperature_min), color="dodgerblue4")+
-    geom_bar(aes(y=Temperature_20*5), stat="identity", alpha=0.4)+
-    scale_y_continuous(sec.axis = sec_axis(trans=~./5, name=bquote(N~months~with~mean~temperature~">="~20~degree*C)))+
+    geom_ribbon(aes(ymin=Temperature_min, ymax=Temperature_max, fill=Season), alpha=0.4)+
+    geom_line(aes(y=Temperature_mean, color=Season))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
-    #scale_color_discrete(guide=guide_legend(title=NULL))+
-    ylab(bquote(Mean~temperature~"("*degree*C*")"~of~the~hottest*","~median*","~and~coldest~months))+
+    scale_color_brewer(type="qual", palette="Set2", name="DS life stage\n(Season)")+
+    scale_fill_brewer(type="qual", palette="Set2", name="DS life stage\n(Season)")+
     ggtitle("Temperature")+
+    ylab(bquote(Temperature~"("*degree*c*")"))+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     xlab("Date")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.80,0.15), legend.background=element_rect(fill="white", color="black"))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
   
   pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)", "Secchi depth")

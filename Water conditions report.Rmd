@@ -72,11 +72,11 @@ X2 was about average in 2018 but higher than the record low the previous year.
 WC$Temperature
 ```
 
-Delta smelt are sensitive to high water temperatures and their sensitivity varies seasonally. More detail....
+Delta smelt are sensitive to high water temperatures. Different life stages occur in different times of year that determine their temperature exposure. This graph displays the mean water temperature of the coldest, average, and hottest month each life stage would have experienced. Winter is defined as Dec-Mar, Spring as Apr-Jun, and Summer/fall as Jul-Nov. More detail....
 
-Red=max, purple=median, blue=min, bars= number of months with a mean temperature > 20$^\circ$C. Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
+Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
 
-```{r}
+```{r, fig.height=3.5}
 WC$Secchi
 ```
 
@@ -100,7 +100,7 @@ Salinity was average in 2018.
 WC$Chlorophyll
 ```
 
-Chlorophyll is a measure of productivity at the base of the Delta food web. Higher chlorophyll indicates more food is available for zooplankton which are important prey for many fish including Delta Smelt. Chlorophyll levels above 10 μg/L (green) are required to sustain zooplankton growth.
+Chlorophyll is a measure of productivity at the base of the food web. Higher chlorophyll indicates more food is available for zooplankton which are important prey for many fish including Delta Smelt. Chlorophyll levels above 10 μg/L (green) are required to sustain zooplankton growth.
 
 Chlorophyll levels were low in 2018.
 
