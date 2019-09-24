@@ -142,7 +142,9 @@ WCWQer<-function(){
     complete(Month, Year, Region)%>%
     group_by(Year, Region)%>%
     summarise(Temperature_20=sum(Temperature>20), Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature=median(Temperature))%>%
-    drop_na()%>%
+    group_by(Region)%>%
+    mutate(N=length(which(!is.na(Temperature_max))))%>%
+    filter(N>0)%>%
     droplevels()
   
   WQsalrange<-WQsum%>%
@@ -194,7 +196,7 @@ WCWQer<-function(){
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     #scale_color_discrete(guide=guide_legend(title=NULL))+
-    ylab(bquote(Min*","~median*","~and~max~monthly~mean~temperature~"("*degree*C*")"))+
+    ylab(bquote(Mean~temperature~"("*degree*C*")"~of~the~hottest*","~median*","~and~coldest~months))+
     ggtitle("Temperature")+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     xlab("Date")+
@@ -205,7 +207,9 @@ WCWQer<-function(){
   pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)", "Secchi depth")
   pChla<-plotWQ(Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), "Chlorophyll")+geom_rect(data=WQchlrange, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3)+scale_fill_manual(guide="none", values=c("#fc8d62", "#66c2a5"))
   
-  pSal<-plotWQ(Salinity, "Salinity", "Salinity")+geom_label(data=WQsalrange, aes(x=as.POSIXct("2000-01-01"), y=21, label=Salrange), alpha=0.5, size=2.5)
+  pSal<-plotWQ(Salinity, "Salinity", "Salinity")+
+    geom_label(data=WQsalrange, aes(x=as.POSIXct("2004-01-01"), y=26, label=Salrange), alpha=0.5, size=2.5)+
+    scale_y_continuous(breaks=seq(0,30, by=5))
   
   ###LOOKS LIKE MICRO ONLY MEASURED IN SUMMER?
   pMicro<-ggplot()+

@@ -32,9 +32,9 @@ WCFisher<-function(){
     filter(Year>=1991)
   
   EDSM<-read_csv("Data/edsm_abund_estimates_2019-09-17.csv")%>%
-    mutate(Stratum=recode(Stratum, "Suisun Bay Marsh"="Suisun Bay/Marsh", "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel", "Suisun Bay"="Suisun Bay/Marsh", "Suisun Marsh"="Suisun Bay/Marsh"),
+    mutate(Stratum=recode(Stratum, "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel"),
            Date=WeekStartDate+ceiling((WeekEndDate-WeekStartDate)/2))%>%
-    filter(Stratum%in%c("Cache Slough/Liberty Island", "Lower Sacramento", "Lower San Joaquin", "Sac Deep Water Shipping Channel", "Southern Delta", "Suisun Bay/Marsh", "Upper Sacramento", "Western Delta"))%>%
+    filter(Stratum%in%c("Cache Slough/Liberty Island", "Lower Sacramento", "Lower San Joaquin", "Sac Deep Water Shipping Channel", "Southern Delta", "Suisun Bay", "Suisun Marsh", "Upper Sacramento", "Western Delta"))%>%
     select(Region=Stratum, Date, Abundance=nHat, lowCI, uppCI)%>%
     mutate(Abundance_l=log10(Abundance+1),
            lowCI_l=log10(lowCI+1),
