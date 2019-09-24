@@ -134,10 +134,16 @@ WCWQer<-function(){
     mutate(Severity=factor(Severity, levels=c("Very high", "High", "Medium", "Low", "Absent")))
   
   WQsumTemp<-WQsum%>%
-    mutate(Season=ifelse(month(MonthYear)<7, "Winter/Spring", "Summer/Fall"))%>%
-    group_by(Season, Year, Region)%>%
-    summarise(Temperature=max(Temperature))%>%
-    complete(Year, Region, Season)
+    mutate(Month=month(MonthYear))%>%
+    #mutate(Season=ifelse(month(MonthYear)<7, "Winter/Spring", "Summer/Fall"))%>%
+    group_by(Month, Year, Region)%>%
+    summarise(Temperature=mean(Temperature, na.rm=T))%>%
+    ungroup()%>%
+    complete(Month, Year, Region)%>%
+    group_by(Year, Region)%>%
+    summarise(Temperature_20=sum(Temperature>20), Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature=median(Temperature))%>%
+    drop_na()%>%
+    droplevels()
   
   WQsalrange<-WQsum%>%
     filter(!is.na(Salinity))%>%
@@ -179,12 +185,16 @@ WCWQer<-function(){
   #           Quality=="Bad" ~ max(WQsum$Temperature)
   #         ))
   
-  pTemp<-ggplot()+
-    geom_line(data=WQsumTemp, aes(x=Year, y=Temperature, color=Season))+
+  pTemp<-ggplot(data=WQsumTemp, aes(x=Year))+
+    geom_line(aes(y=Temperature), color="darkorchid4")+
+    geom_line(aes(y=Temperature_max), color="firebrick3")+
+    geom_line(aes(y=Temperature_min), color="dodgerblue4")+
+    geom_bar(aes(y=Temperature_20*5), stat="identity", alpha=0.4)+
+    scale_y_continuous(sec.axis = sec_axis(trans=~./5, name=bquote(N~months~with~mean~temperature~">="~20~degree*C)))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
-    scale_color_discrete(guide=guide_legend(title=NULL))+
-    ylab(bquote(Maximum~monthly~mean~temperature~"("*degree*C*")"))+
+    #scale_color_discrete(guide=guide_legend(title=NULL))+
+    ylab(bquote(Min*","~median*","~and~max~monthly~mean~temperature~"("*degree*C*")"))+
     ggtitle("Temperature")+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     xlab("Date")+

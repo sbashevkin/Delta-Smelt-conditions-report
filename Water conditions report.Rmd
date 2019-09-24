@@ -1,15 +1,21 @@
 ---
 title: "Water conditions report"
+author: "Sam Bashevkin"
+date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
   pdf_document: 
     latex_engine: xelatex
   html_document: default
 editor_options:
   chunk_output_type: console
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+- \usepackage{float}
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F, warning = FALSE, fig.height=4, fig.width=7.5, fig.align="center")
+knitr::opts_chunk$set(echo = F, warning = FALSE, fig.height=4, fig.width=7.5, fig.align="center", fig.pos='H')
 
 require(sf)
 require(rgdal)
@@ -30,6 +36,18 @@ WC<-WCWQer()
 DF<-WCDayFlower()
 PH<-WCPhyter()
 FISH<-WCFisher()
+```
+
+# Introduction
+
+```{r Delta Smelt photo, echo=FALSE, fig.cap="Juvenile Delta Smelt Dale Kolke / DWR", out.height="20%"}
+knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
+```
+
+Brief intro on what matters to delta smelt, their life cycle, and which regions they commonly occupy in different life stages.
+
+```{r Delta map, echo=FALSE, fig.height=4, out.height="50%"}
+knitr::include_graphics("Figures/map.png")
 ```
 
 # Abiotic drivers
@@ -56,15 +74,7 @@ WC$Temperature
 
 Delta smelt are sensitive to high water temperatures and their sensitivity varies seasonally. More detail....
 
-Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
-
-```{r}
-WC$Salinity
-```
-
-Delta smelt prefer fresh water and are most abundant in salinities of 1-2 ppt, are rare in salinities higher than 6 ppt, and are not found in salinities above 14 ppt. A small percentage of Delta smelt are spawned in the brackish waters, but use freshwater during winter and spring months to spawn. 
-
-Salinity was average in 2018.
+Red=max, purple=median, blue=min, bars= number of months with a mean temperature > 20$^\circ$C. Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
 
 ```{r}
 WC$Secchi
@@ -73,6 +83,14 @@ WC$Secchi
 Secchi depth is a measure of turbidity. Lower secchi depth indicates higher turbidity, which is preferred by Delta Smelt.
 
 Secchi depth was above average in most regions in the Delta in 2018, reflecting a general trend of decreasing turbidity over the past few years.
+
+```{r, fig.height=6}
+WC$Salinity
+```
+
+Delta smelt prefer fresh water and are most abundant in salinities of 1-2 ppt, are rare in salinities higher than 6 ppt, and are not found in salinities above 14 ppt. A small percentage of Delta smelt are spawned in the brackish waters, but use freshwater during winter and spring months to spawn. 
+
+Salinity was average in 2018.
 
 \pagebreak
 
