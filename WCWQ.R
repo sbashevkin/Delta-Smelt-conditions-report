@@ -41,8 +41,6 @@ WCWQer<-function(){
   
   Labfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Lab")
   
-  Widefiles <- list.files(path = "Data/Water quality", full.names = T, pattern="EMP")
-  
   WQ<-sapply(Fieldfiles, function(x) read_excel(x, guess_max = 5e4))%>%
     bind_rows()%>%
     select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult)%>%
