@@ -70,7 +70,7 @@ WCWQer<-function(){
                 mutate(Microcystis=round(Microcystis))%>% #EMP has some 2.5 and 3.5 values
                 select(-Latitude, -Longitude))%>%
     mutate(Source="EMP")%>%
-    bind_rows(FMWT, EDSM%>%
+    bind_rows(FMWT, STN, EDSM%>%
                 select(-Latitude, -Longitude))%>%
     mutate(MonthYear=floor_date(Date, unit = "month"),
            Year=year(Date),
