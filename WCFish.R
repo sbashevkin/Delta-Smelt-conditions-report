@@ -1,4 +1,4 @@
-WCFisher<-function(){
+WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel")){
   # Setup -------------------------------------------------------------------
   
   
@@ -29,17 +29,35 @@ WCFisher<-function(){
         mutate(Source="SKT"),
       read_excel("Data/20mm DS index.xlsx")%>%
         mutate(Source="20mm"))%>%
-    filter(Year>=1991)
+    filter(Year>=Start_year)
   
   EDSM<-read_csv("Data/edsm_abund_estimates_2019-09-17.csv")%>%
-    mutate(Stratum=recode(Stratum, "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel"),
+    mutate(Stratum=recode(Stratum, "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel",
+                          "Lower Sacramento"="Lower Sacramento River", "Lower San Joaquin"="Lower Joaquin River"),
            Date=WeekStartDate+ceiling((WeekEndDate-WeekStartDate)/2))%>%
-    filter(Stratum%in%c("Cache Slough/Liberty Island", "Lower Sacramento", "Lower San Joaquin", "Sac Deep Water Shipping Channel", "Southern Delta", "Suisun Bay", "Suisun Marsh", "Upper Sacramento", "Western Delta"))%>%
-    select(Region=Stratum, Date, Abundance=nHat, lowCI, uppCI)%>%
+    select(Region=Stratum, Date, Abundance=nHat, lowCI, uppCI, Variance=nVar)%>% 
+    mutate(MonthYear=floor_date(Date, unit = "month"))%>%
+    filter(!is.na(Abundance))%>%
+    mutate(Variance=replace_na(Variance, 0))%>%
+    group_by(Region, MonthYear)%>%
+    summarise(Abundance=mean(Abundance, na.rm=T), Abundance_CV=sqrt((1/n()^2)*sum(Variance))/Abundance)%>%
+    mutate(l95=qlnorm(0.025, meanlog=log(Abundance/sqrt(1+Abundance_CV^2)), sdlog=log(1+Abundance_CV^2)),
+           u95=qlnorm(0.975, meanlog=log(Abundance/sqrt(1+Abundance_CV^2)), sdlog=log(1+Abundance_CV^2)))%>%
     mutate(Abundance_l=log10(Abundance+1),
-           lowCI_l=log10(lowCI+1),
-           uppCI_l=log10(uppCI+1))%>%
-    filter(!(Region%in%c("Upper Sacramento", "Southern Delta"))) #No DS ever caught in these regions so removing them
+           l95_l=log10(l95),
+           u95_l=log10(u95))%>%
+    filter(!(Region%in%c("Upper Sacramento", "Southern Delta")) & Region%in%EDSM_regions)%>%#No DS ever caught in these regions so removing them
+    mutate(missing="na")%>%
+    complete(MonthYear, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  EDSMmissing<-EDSM%>%
+    filter(missing=="n.d.")%>%
+    select(MonthYear, Region)
+  
+  EDSM<-EDSM%>%
+    filter(is.na(missing))%>%
+    select(-missing)
   
   
   # Add regions and summarise -------------------------------------------------------------
@@ -49,9 +67,10 @@ WCFisher<-function(){
   
   p<-list()
   
-  p$IEP<-ggplot(IEP_Indices, aes(x=Year, y=Index, color=Source))+
-    geom_line(size=1)+
-    geom_point()+
+  p$IEP<-ggplot()+
+    geom_line(data=IEP_Indices, aes(x=Year, y=Index, color=Source), size=1)+
+    geom_point(data=IEP_Indices, aes(x=Year, y=Index, color=Source))+
+    geom_point(data=filter(IEP_Indices, Year==End_year), aes(x=Year, y=Index, color=Source), size=3, color="firebrick3")+
     coord_cartesian(expand=0)+
     facet_grid(Source~., scales = "free_y")+
     scale_color_brewer(type="div", palette="RdYlBu", guide="none")+
@@ -62,12 +81,17 @@ WCFisher<-function(){
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   
-  p$EDSM<-ggplot(data=EDSM, aes(x=Date, y=Abundance_l))+
-    geom_point(color="darkorchid4")+
-    geom_errorbar(aes(ymin=lowCI_l, ymax=uppCI_l), alpha=0.6)+
-    coord_cartesian(expand=0)+
+  p$EDSM<-ggplot()+
+    geom_line(data=EDSM, aes(x=MonthYear, y=Abundance_l), color="darkorchid4")+
+    geom_errorbar(data=EDSM, aes(x=MonthYear, ymax=u95_l, ymin=l95_l))+
+    geom_point(data=filter(EDSM, year(MonthYear)!=End_year), aes(x=MonthYear, y=Abundance_l), color="darkorchid4")+
+    geom_point(data=filter(EDSM, year(MonthYear)==End_year), aes(x=MonthYear, y=Abundance_l), color="firebrick3", size=2.3)+
+    geom_vline(data=EDSMmissing, aes(xintercept=MonthYear), linetype=2)+
+    coord_cartesian(ylim=c(2,5.7))+
     facet_wrap(~Region)+
-    ylab("log(Delta Smelt abundance+1)")+
+    scale_x_date(date_labels = "%b %y")+
+    scale_y_continuous(labels = function(x) format(10^x, scientific=F, big.mark=","))+
+    ylab("Delta Smelt abundance")+
     xlab("Date")+
     ggtitle("EDSM Delta Smelt Abundance")+
     theme_bw()+

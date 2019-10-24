@@ -1,6 +1,8 @@
-WCmapper<-function(){
+WCmapper<-function(Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel")){
   require(sf)
+  require(rgeos)
   require(rgdal)
+  require(leaflet)
   require(raster)
   require(tidyverse)
   require(readxl)
@@ -10,6 +12,8 @@ WCmapper<-function(){
   Deltaregions<-st_read("Data/Delta regions", quiet=T)
   Deltaregions<-as(Deltaregions, "Spatial")
   Deltaregions <- spTransform(Deltaregions, CRS("+init=epsg:4326"))
+  
+  Deltaregions <- Deltaregions[Deltaregions@data$Stratum %in% Regions, ]
   
   centers <- data.frame(gCentroid(Deltaregions, byid = TRUE))
   centers$region <- Deltaregions$Stratum

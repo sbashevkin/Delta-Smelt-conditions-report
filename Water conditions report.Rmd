@@ -1,6 +1,6 @@
 ---
-title: "Water conditions report"
-author: "Sam Bashevkin"
+title: "Delta smelt conditions report"
+author: "Delta Science Program"
 date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
   pdf_document: 
@@ -56,7 +56,7 @@ knitr::include_graphics("Figures/map.png")
 DF$Out
 ```
 
-High Delta outflow into the San Francisco Bay is good for Delta Smelt because...
+High Delta outflow into the San Francisco Bay is good for Delta Smelt because... Fall months are highlighted in orange.
 
 Outflow was average in 2018 but much lower than the record flows in 2017.
 
@@ -64,7 +64,7 @@ Outflow was average in 2018 but much lower than the record flows in 2017.
 DF$X2
 ```
 
-X2 is a measure of salinity intrusion defined as the distance from the golden gate to where the salinity of the bottom water reaches 2. Lower X2 is better for Delta smelt because it means there is more low salinity habitat for them to occupy.....
+X2 is a measure of salinity intrusion defined as the distance from the golden gate to where the salinity of the bottom water reaches 2. Lower X2 is better for Delta smelt because it means there is more low salinity habitat for them to occupy.....Fall months are highlighted in orange.
 
 X2 was about average in 2018 but higher than the record low the previous year.
 
@@ -158,6 +158,6 @@ All abundance indices in 2018 were low or impossible to calculate due to very lo
 FISH$EDSM
 ```
 
-EDSM calculates abundance estimates with confidence intervals every week. __*Note that the y-axis is log transformed (i.e. 1=10, 2=100, 3=1000, etc.) and the x axis starts in mid 2017.*__
+EDSM calculates abundance estimates with confidence intervals every week. __*Note that the y-axis is log transformed (i.e. 1=10, 2=100, 3=1000, etc.) and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all missing values below the limit are 0s.*__
 
 EDSM also documents a general decline in Delta Smelt across all regions (since mid 2017).

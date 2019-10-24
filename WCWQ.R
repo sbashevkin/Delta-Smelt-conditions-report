@@ -1,4 +1,4 @@
-WCWQer<-function(){
+WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Temp_season="Summer", Secchi_season="Fall", Salinity_season="Fall", Chl_season="Summer", Micro_season="Summer"){
   
   
   # Setup -------------------------------------------------------------------
@@ -14,6 +14,8 @@ WCWQer<-function(){
   
   
   # Load and combine data ---------------------------------------------------
+  
+  
   
   FMWT<-read_excel("Data/FMWT 1967-2018 Catch Matrix_updated.xlsx", sheet="FlatFile", guess_max=30000)%>%
     select(Date, Station, Conductivity=starts_with("Top EC"), Secchi=`Secchi (m)`, Microcystis, Temperature=starts_with("Top Temperature"))%>%
@@ -101,17 +103,104 @@ WCWQer<-function(){
   
   #Add regions and lat/long to zoop dataset
   WQsum<-WQ%>%
-    filter(year(MonthYear)>=1991)%>%
+    filter(year(MonthYear)>=Start_year)%>%
     left_join(Stations, by=c("Source", "Station"))%>%
-    filter(!is.na(Region))%>% 
-    group_by(Region, Year, MonthYear)%>%
-    summarise(Temperature=mean(Temperature, na.rm=T), Chlorophyll=mean(Chlorophyll, na.rm=T), Secchi_depth=mean(Secchi_depth, na.rm=T), Salinity=mean(Salinity, na.rm=T), N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
-    ungroup()
+    filter(Region%in%Regions)%>%
+    mutate(Month=month(MonthYear))
   
-  Microsum<-WQ%>%
-    filter(year(MonthYear)>=1991 & !is.na(Microcystis))%>%
-    left_join(Stations, by=c("Source", "Station"))%>%
-    filter(!is.na(Region))%>% 
+  Secchisum<-WQsum%>%
+    select(Month, Region, Secchi_depth, Year)%>%
+    filter(!is.na(Secchi_depth))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Secchi_season)%>%
+    droplevels()%>%
+    group_by(Region, Year)%>%
+    summarise(Secchi_depth=mean(Secchi_depth, na.rm=T))%>%
+    ungroup()%>%
+    mutate(missing="na")%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Secchimissing<-Secchisum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Secchisum<-Secchisum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
+  
+  Salsum<-WQsum%>%
+    select(Month, Region, Salinity, Year)%>%
+    filter(!is.na(Salinity))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Salinity_season)%>%
+    droplevels()%>%
+    group_by(Region, Year)%>%
+    summarise(Salinity=mean(Salinity, na.rm=T))%>%
+    ungroup()%>%
+    mutate(missing="na")%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Salmissing<-Salsum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Salsum<-Salsum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
+  
+  Chlsum<-WQsum%>%
+    select(Month, Region, Chlorophyll, Year)%>%
+    filter(!is.na(Chlorophyll))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Chl_season)%>%
+    droplevels()%>%
+    group_by(Region, Year)%>%
+    summarise(Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
+    ungroup()%>%
+    mutate(missing="na")%>%
+    complete(Year, Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"))
+  
+  Chlmissing<-Chlsum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Chlsum<-Chlsum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
+  
+  Microsum<-WQsum%>%
+    select(Month, Region, Microcystis, Year)%>%
+    filter(!is.na(Microcystis))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Micro_season)%>%
+    droplevels()%>%
     group_by(Region, Year)%>%
     summarise(N_Microcystis=length(which(!is.na(Microcystis))), Microcystis1=length(which(Microcystis==1))/N_Microcystis, Microcystis2=length(which(Microcystis==2))/N_Microcystis, Microcystis3=length(which(Microcystis==3))/N_Microcystis, Microcystis4=length(which(Microcystis==4))/N_Microcystis, Microcystis5=length(which(Microcystis==5))/N_Microcystis)%>%
     ungroup()%>%
@@ -131,43 +220,45 @@ WCWQer<-function(){
     select(-missing)%>%
     mutate(Severity=factor(Severity, levels=c("Very high", "High", "Medium", "Low", "Absent")))
   
-  WQsumTemp<-WQsum%>%
-    mutate(Month=month(MonthYear))%>%
+  Tempsum<-WQsum%>%
+    select(Month, Region, Temperature, Year)%>%
+    filter(!(Region%in%c("Cache Slough/Liberty Island", "Sac Deep Water Shipping Channel")))%>%
+    droplevels()%>%
     group_by(Month, Year, Region)%>%
     summarise(Temperature=mean(Temperature, na.rm=T))%>%
     ungroup()%>%
     complete(Month, Year, Region)%>%
     mutate(Season=case_when(
-      Month%in%c(12,1,2,3) ~ "Adult\n(winter)",
-      Month%in%c(4,5,6) ~ "Larvae\n(spring)",
-      Month%in%c(7,8,9,10,11) ~ "Juvenile\n(summer/fall)"),
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
       Year=if_else(Month==12, Year-1, Year)
     )%>%
-    group_by(Year, Season, Region)%>%
-    summarise(Temperature_20=sum(Temperature>20), Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature))%>%
-    ungroup()%>%
-    filter(!(Region%in%c("Cache Slough/Liberty Island", "Sac Deep Water Shipping Channel")))%>%
-    droplevels()%>%
-    mutate(Season=factor(Season, levels=c("Larvae\n(spring)", "Juvenile\n(summer/fall)", "Adult\n(winter)")))
+    filter(Season%in%Temp_season)%>%
+    group_by(Year, Region)%>%
+    summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature))%>%
+    ungroup()
   
-  WQsalrange<-WQsum%>%
+  Salrange<-Salsum%>%
     filter(!is.na(Salinity))%>%
     group_by(Region)%>%
     summarise(Salrange=paste0("min: ", round(min(Salinity), 2), ", max: ", round(max(Salinity), 2)))
   
-  WQchlrange<-tibble(xmin=min(WQsum$MonthYear), xmax=max(WQsum$MonthYear), Region=unique(as.character(filter(WQsum, !is.na(Chlorophyll))$Region)))
-  WQchlrange<-WQchlrange%>%
+  Chlrange<-tibble(xmin=min(Chlsum$Year), xmax=max(Chlsum$Year), Region=unique(as.character(filter(Chlsum, !is.na(Chlorophyll))$Region)))
+  Chlrange<-Chlrange%>%
     mutate(ymin=0, ymax=10, Quality="Bad")%>%
-    bind_rows(WQchlrange%>%
-                mutate(ymin=10, ymax=max(WQsum$Chlorophyll, na.rm=T), Quality="Good"))  
+    bind_rows(Chlrange%>%
+                mutate(ymin=10, ymax=max(Chlsum$Chlorophyll, na.rm=T), Quality="Good"))  
   
   # Plot --------------------------------------------------------------------
   
-  plotWQ<-function(Parameter, ylabel, Title){
+  plotWQ<-function(Data, Parameter, ylabel, Title){
     Parameter<-enquo(Parameter)
     ggplot()+
-      geom_line(data=filter(WQsum, !is.na(!!Parameter)), aes(x=MonthYear, y=!!Parameter), color="firebrick3")+
-      coord_cartesian(expand=0)+
+      geom_line(data=Data, aes(x=Year, y=!!Parameter), color="firebrick3")+
+      geom_point(data=filter(Data, Year==End_year), aes(x=Year, y=!!Parameter), color="firebrick3", size=3)+
+      scale_y_continuous(expand = expand_scale(0,0))+
       facet_wrap(~Region)+
       ylab(ylabel)+
       xlab("Date")+
@@ -190,40 +281,42 @@ WCWQer<-function(){
   #           Quality=="Bad" ~ max(WQsum$Temperature)
   #         ))
   
-  pTemp<-ggplot(data=WQsumTemp, aes(x=Year))+
-    geom_ribbon(aes(ymin=Temperature_min, ymax=Temperature_max, fill=Season), alpha=0.4)+
-    geom_line(aes(y=Temperature_mean, color=Season))+
+  pTemp<-ggplot()+
+    geom_ribbon(data=Tempsum, aes(x=Year, ymin=Temperature_min, ymax=Temperature_max), alpha=0.4)+
+    geom_point(data=filter(Tempsum, Year==End_year), aes(x=Year, y=Temperature_mean), color="firebrick3", size=3)+
+    geom_line(data=Tempsum, aes(x=Year, y=Temperature_mean))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
-    scale_color_brewer(type="qual", palette="Set2", name="DS life stage\n(Season)")+
-    scale_fill_brewer(type="qual", palette="Set2", name="DS life stage\n(Season)")+
-    ggtitle("Temperature")+
+    ggtitle(paste(Temp_season, "temperature", collapse=", "))+
     ylab(bquote(Temperature~"("*degree*c*")"))+
-    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    scale_x_continuous(breaks = seq(2000, 2020, by=5))+
     xlab("Date")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
   
-  pSecchi<-plotWQ(Secchi_depth, "Secchi depth (cm)", "Secchi depth")
-  pChla<-plotWQ(Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), "Chlorophyll")+geom_rect(data=WQchlrange, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.3)+scale_fill_manual(guide="none", values=c("#fc8d62", "#66c2a5"))
+  pSecchi<-plotWQ(Secchisum, Secchi_depth, "Secchi depth (cm)", paste(Secchi_season, "secchi depth", collapse=", "))+
+    geom_vline(data=Secchimissing, aes(xintercept=Year), linetype=2)
+  pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), paste(Chl_season, "chlorophyll", collapse=", "))+
+    geom_vline(data=Chlmissing, aes(xintercept=Year), linetype=2)
   
-  pSal<-plotWQ(Salinity, "Salinity", "Salinity")+
-    geom_label(data=WQsalrange, aes(x=as.POSIXct("2004-01-01"), y=26, label=Salrange), alpha=0.5, size=2.5)+
-    scale_y_continuous(breaks=seq(0,30, by=5))
+  pSal<-plotWQ(Salsum, Salinity, "Salinity", paste(Salinity_season, "salinity", collapse=", "))+
+    geom_label(data=Salrange, aes(x=2006, y=11, label=Salrange), alpha=0.5, size=2.5)+
+    geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)
   
   ###LOOKS LIKE MICRO ONLY MEASURED IN SUMMER?
   pMicro<-ggplot()+
-    geom_bar(data=Microsum, aes(x=Year, y=Frequency, fill=Severity), stat="identity")+
+    geom_bar(data=filter(Microsum, Year!=End_year), aes(x=Year, y=Frequency, fill=Severity), stat="identity", alpha=0.7)+
+    geom_bar(data=filter(Microsum, Year==End_year), aes(x=Year, y=Frequency, fill=Severity), stat="identity", alpha=1)+
     geom_vline(data=Micromissing, aes(xintercept=Year), linetype=2)+
-    scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(keyheight=0.8, title=NULL))+
+    scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(keyheight=0.8, title=NULL, direction="horizontal", label.position="top", reverse=TRUE))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
     ylab("Relative frequency")+
     xlab("Date")+
-    ggtitle("Microcystis")+
+    ggtitle(paste(Micro_season, "Microcystis", collapse=", "))+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.83, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.63, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   
   plots<-list(Temperature=pTemp, Secchi=pSecchi, Salinity=pSal, Chlorophyll=pChla, Microcystis=pMicro)
   

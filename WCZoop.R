@@ -1,4 +1,4 @@
-WCZooper<-function(Download=F){
+WCZooper<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
   
 
 # Setup -------------------------------------------------------------------
@@ -86,11 +86,21 @@ WCZooper<-function(Download=F){
   #Add regions and lat/long to zoop dataset
   Zoopsum<-Zoop%>%
     left_join(Stations, by="Station")%>%
-    filter(!is.na(Region))%>% 
+    filter(Region%in%Regions)%>%
+    mutate(Month=month(MonthYear))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Seasons)%>%
+    droplevels()%>% 
     group_by(Region, Year, Taxa)%>%
     summarise(BPUE=mean(BPUE, na.rm=T))%>%
     ungroup()%>%
-    filter(Year>=1991)%>%
+    filter(Year>=Start_year)%>%
     droplevels()%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
@@ -109,16 +119,19 @@ WCZooper<-function(Download=F){
 # Plot --------------------------------------------------------------------
 
   p<-ggplot()+
-    geom_bar(data=Zoopsum, aes(x=Year, y=BPUE, fill=Taxa), stat="identity")+
+    geom_bar(data=filter(Zoopsum, Year!=End_year), aes(x=Year, y=BPUE, fill=Taxa), stat="identity", alpha=0.7)+
+    geom_bar(data=filter(Zoopsum, Year==End_year), aes(x=Year, y=BPUE, fill=Taxa), stat="identity", alpha=1)+
     geom_vline(data=Zoopmissing, aes(xintercept=Year), linetype=2)+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
     scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(title=NULL, keyheight=0.8))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     coord_cartesian(expand=0)+
     xlab("Date")+
-    ggtitle("Zooplankton")+
+    ggtitle(paste(Seasons, "zooplankton", collapse=", "))+
     facet_wrap(~Region)+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.12), legend.text=element_text(size=8), legend.background=element_rect(fill="white", color="black"))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.2), legend.text=element_text(size=8), legend.background=element_rect(fill="white", color="black"))
+  
   ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=4, units="in")
   
   return(p)

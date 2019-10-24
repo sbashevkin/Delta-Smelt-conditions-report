@@ -1,6 +1,6 @@
 #MISSING STATION LAT LONGS FOR SOME STATIONS
 
-WCPhyter<-function(Download=F){
+WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Seasons="Summer"){
   
   
   # Setup -------------------------------------------------------------------
@@ -32,7 +32,8 @@ WCPhyter<-function(Download=F){
                           TRUE ~ "Other taxa"))%>%
     mutate(Year=year(Date),
            MonthYear=floor_date(Date, unit = "month"),
-           Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))
+           Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))%>%
+    filter(Year>=2008)
   
   
   # Add regions and summarise -------------------------------------------------------------
@@ -59,14 +60,24 @@ WCPhyter<-function(Download=F){
   #Add regions and lat/long to phyto dataset
   Phytosum<-Phyto%>%
     left_join(Stations, by="Station")%>%
-    filter(!is.na(Region))%>% 
+    filter(Region%in%Regions)%>% 
     group_by(Taxa, Region, Year, Date, Station)%>%
     summarise(CPUE=sum(CPUE, na.rm=T))%>%
     ungroup()%>%
+    mutate(Month=month(Date))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Seasons)%>%
+    droplevels()%>%
     group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()%>%
-    filter(Year>=1991)%>%
+    filter(Year>=Start_year)%>%
     mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Green Algae", "Cryptophytes", "Chrysophytes", "Cyanobacteria", "Dinoflagellates", "Other flagellates", "Other taxa")),
            missing="na",
            Region=as.character(Region))%>%
@@ -87,27 +98,30 @@ WCPhyter<-function(Download=F){
   # Plot --------------------------------------------------------------------
   
   pphyto<-ggplot()+
-    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria"), aes(x=Year, y=CPUE, fill=Taxa), stat="identity")+
+    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria" & Year!=End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=0.7)+
+    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria" & Year==End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=1)+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
-    geom_label(data=Peak, aes(x=Year-7, y=35000, label=label), size=3)+
-    #scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
-    scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(keyheight=0.7, title=NULL), direction=-1)+
+    geom_label(data=Peak, aes(x=Year-2, y=30000, label=label), size=3)+
+    scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(keyheight=0.6, title=NULL), direction=-1)+
     xlab("Date")+
-    coord_cartesian(expand=0, ylim=c(0,62000))+
+    coord_cartesian(expand=0, ylim=c(0,35000))+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     facet_wrap(~Region)+
-    ggtitle("Phytoplankton")+
+    ggtitle(paste(Seasons, "phytoplankton", collapse=", "))+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.1, 0.23), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.2), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
 
   pcyano<-ggplot()+
-    geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria"), aes(x=Year, y=CPUE), fill="chartreuse4", stat="identity")+
+    geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria" & Year!=End_year), aes(x=Year, y=CPUE), fill="chartreuse4", stat="identity", alpha=0.7)+
+  geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria" & Year==End_year), aes(x=Year, y=CPUE), fill="chartreuse4", stat="identity", alpha=1)+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     xlab("Date")+
-    coord_cartesian(expand=0)+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
+    coord_cartesian(expand=0)+
     facet_wrap(~Region)+
-    ggtitle("Cyanobacteria")+
+    ggtitle(paste(Seasons, "cyanobacteria", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
 

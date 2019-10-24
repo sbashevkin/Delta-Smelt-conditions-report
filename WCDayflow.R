@@ -1,4 +1,4 @@
-WCDayFlower<-function(Download=F){
+WCDayFlower<-function(Start_year=2002, End_year=2018){
   
   
   # Setup -------------------------------------------------------------------
@@ -20,7 +20,7 @@ WCDayFlower<-function(Download=F){
     bind_rows(read_csv("Data/Dayflow1984 1996.csv", col_types = "cddcddddddddddddddddddddddddd")%>%
                 mutate(DATE=parse_date_time(DATE, "%d-%b-%y"))%>%
                 select(Date=DATE, OUT))%>%
-    filter(year(Date)>=1991)%>%
+    filter(year(Date)>=Start_year)%>%
     mutate(MonthYear=floor_date(Date, unit = "month"))%>%
     group_by(MonthYear)%>%
     summarise(OUT=mean(OUT, na.rm=T), X2=mean(X2, na.rm=T))
@@ -28,9 +28,22 @@ WCDayFlower<-function(Download=F){
   
   # Plot data ---------------------------------------------------------------
   
+  Fallshade<-DF%>%
+    mutate(Year=year(MonthYear))%>%
+    select(Year)%>%
+    distinct()%>%
+    mutate(September=parse_date_time(paste0("09/", Year), "%m/%Y"),
+           November=parse_date_time(paste0("11/", Year), "%m/%Y"))%>%
+    mutate(X2min=min(DF$X2),
+           X2max=max(DF$X2),
+           OUTmin=min(DF$OUT),
+           OUTmax=max(DF$OUT))
+  
   p<-list()
   p$X2<-ggplot()+
     geom_line(data=DF, aes(x=MonthYear, y=X2), color="dodgerblue4")+
+    geom_line(data=filter(DF, year(MonthYear)==End_year), aes(x=MonthYear, y=X2), color="firebrick3", size=2)+
+    geom_rect(data=Fallshade, aes(xmin=September, xmax=November, ymin=X2min, ymax=X2max), alpha=0.4, fill="darkorange1")+
     coord_cartesian(expand=0)+
     ylab("X2 (km)")+
     xlab("Date")+
@@ -40,7 +53,10 @@ WCDayFlower<-function(Download=F){
   
   p$Out<-ggplot()+
     geom_line(data=DF, aes(x=MonthYear, y=OUT), color="dodgerblue4")+
+    geom_line(data=filter(DF, year(MonthYear)==End_year), aes(x=MonthYear, y=OUT), color="firebrick3", size=2)+
+    geom_rect(data=Fallshade, aes(xmin=September, xmax=November, ymin=OUTmin, ymax=OUTmax), alpha=0.4, fill="darkorange1")+
     coord_cartesian(expand=0)+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     ylab(bquote("Delta"~outflow~"("*ft^3*"/s)"))+
     xlab("Date")+
     ggtitle("Delta outflow")+

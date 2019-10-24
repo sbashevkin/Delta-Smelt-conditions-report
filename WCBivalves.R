@@ -1,4 +1,4 @@
-WCBivalver<-function(Download=F){
+WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Seasons="Fall"){
   
   
   # Setup -------------------------------------------------------------------
@@ -45,9 +45,19 @@ WCBivalver<-function(Download=F){
   
   #Add regions and lat/long to zoop dataset
   Bivsum<-Biv%>%
-    filter(Year>=1991)%>%
+    filter(Year>=Start_year)%>%
     left_join(Stations, by="Station")%>%
-    filter(!is.na(Region))%>% 
+    filter(Region%in%Regions)%>%
+    mutate(Month=month(MonthYear))%>%
+    mutate(Season=case_when(
+      Month%in%c(12,1,2) ~ "Winter",
+      Month%in%c(3,4,5) ~ "Spring",
+      Month%in%c(6,7,8) ~ "Summer",
+      Month%in%c(9,10,11) ~ "Fall"),
+      Year=if_else(Month==12, Year-1, Year)
+    )%>%
+    filter(Season%in%Seasons)%>%
+    droplevels()%>%
     group_by(Region, Year, Taxa)%>%
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()%>%
@@ -68,16 +78,17 @@ WCBivalver<-function(Download=F){
   
   # Plot --------------------------------------------------------------------
   
-  p<-Bivsum%>%
-    ggplot(aes(x=Year, y=CPUE, fill=Taxa))+
+  p<-ggplot()+
     geom_vline(data=Bivmissing, aes(xintercept=Year), linetype=2)+
-    geom_area()+
+    geom_bar(data=filter(Bivsum, Year!=End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=0.7)+
+    geom_bar(data=filter(Bivsum, Year==End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=1)+
     scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     xlab("Date")+
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"), guide=guide_legend(title=NULL))+
     coord_cartesian(expand=0)+
     facet_wrap(~Region)+
-    ggtitle("Invasive bivalve abundance")+
+    ggtitle(paste(Seasons, "invasive bivalve abundance", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
