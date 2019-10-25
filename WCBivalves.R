@@ -1,4 +1,4 @@
-WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Seasons="Fall"){
+WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
   
   
   # Setup -------------------------------------------------------------------
@@ -64,7 +64,8 @@ WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cach
     mutate(missing="na",
            Region=as.character(Region))%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Bivmissing<-Bivsum%>%
     filter(missing=="n.d.")%>%

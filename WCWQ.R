@@ -1,4 +1,4 @@
-WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Temp_season="Summer", Secchi_season="Fall", Salinity_season="Fall", Chl_season="Summer", Micro_season="Summer"){
+WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Temp_season="Summer", Secchi_season="Fall", Salinity_season="Fall", Chl_season="Summer", Micro_season="Summer"){
   
   
   # Setup -------------------------------------------------------------------
@@ -36,8 +36,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     mutate(Station=paste(Latitude, Longitude),
            Source="EDSM",
            Date=parse_date_time(Date, "%m/%d/%Y"))%>%
-    select(-Conductivity) #Methods in EDI metadata say they do not know if their data were corrected for temperature so I will not use this data
-  
+    select(-Conductivity)%>% #Methods in EDI metadata say they do not know if their data were corrected for temperature so I will not use this data
+    distinct()
   
   Fieldfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Field")
   
@@ -58,14 +58,14 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
                 summarise(Value=mean(Value, na.rm=T))%>%
                 ungroup())%>%
     spread(key=Parameter, value=Value)%>%
-    rename(Chlorophyll=`Chlorophyll a`, Secchi_depth=`Secchi Depth`, Conductivity=`Conductance (EC)`)%>%
+    rename(Chlorophyll=`Chlorophyll a`, Secchi=`Secchi Depth`, Conductivity=`Conductance (EC)`)%>%
     bind_rows(read_excel("Data/EMP WQ Combined_2000-2018.xlsx", na=c("N/A", "<R.L.", "Too dark"), col_types = c(rep("text", 3), "date", rep("text", 37)))%>%
-                select(Station=`Station Name`, Date, Chlorophyll=starts_with("Chlorophyll"), Latitude=`North Latitude Degrees (d.dd)`, Longitude=`West Longitude Degrees (d.dd)`, Microcystis=`Microcystis aeruginosa`, Secchi_depth=`Secchi Depth Centimeters`, Temperature=starts_with("Water Temperature"), Conductivity=starts_with("Specific Conductance"))%>%
+                select(Station=`Station Name`, Date, Chlorophyll=starts_with("Chlorophyll"), Latitude=`North Latitude Degrees (d.dd)`, Longitude=`West Longitude Degrees (d.dd)`, Microcystis=`Microcystis aeruginosa`, Secchi=`Secchi Depth Centimeters`, Temperature=starts_with("Water Temperature"), Conductivity=starts_with("Specific Conductance"))%>%
                 mutate(Chlorophyll=parse_double(ifelse(Chlorophyll%in%c("<0.05", "<0.5"), 0, Chlorophyll)),
                        Latitude=parse_double(Latitude),
                        Longitude=parse_double(Longitude),
                        Microcystis=parse_double(Microcystis),
-                       Secchi_depth=parse_double(Secchi_depth),
+                       Secchi=parse_double(Secchi),
                        Temperature=parse_double(Temperature),
                        Conductivity=parse_double(Conductivity),
                        Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))%>%
@@ -109,8 +109,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     mutate(Month=month(MonthYear))
   
   Secchisum<-WQsum%>%
-    select(Month, Region, Secchi_depth, Year)%>%
-    filter(!is.na(Secchi_depth))%>%
+    select(Month, Region, Secchi, Year)%>%
+    filter(!is.na(Secchi))%>%
     mutate(Season=case_when(
       Month%in%c(12,1,2) ~ "Winter",
       Month%in%c(3,4,5) ~ "Spring",
@@ -121,11 +121,12 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     filter(Season%in%Secchi_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Secchi_depth=mean(Secchi_depth, na.rm=T))%>%
+    summarise(Secchi=mean(Secchi, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Secchimissing<-Secchisum%>%
     filter(missing=="n.d.")%>%
@@ -152,7 +153,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Salmissing<-Salsum%>%
     filter(missing=="n.d.")%>%
@@ -179,7 +181,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Chlmissing<-Chlsum%>%
     filter(missing=="n.d.")%>%
@@ -209,7 +212,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     mutate(Severity=recode(Severity, "Microcystis1"="Absent", "Microcystis2"="Low", "Microcystis3"="Medium", "Microcystis4"="High", "Microcystis5"="Very high"))%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"),
+           Region=factor(Region, levels=Regions))
   
   Micromissing<-Microsum%>%
     filter(missing=="n.d.")%>%
@@ -238,7 +242,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     filter(Season%in%Temp_season)%>%
     group_by(Year, Region)%>%
     summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature))%>%
-    ungroup()
+    ungroup()%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Salrange<-Salsum%>%
     filter(!is.na(Salinity))%>%
@@ -249,7 +254,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
   Chlrange<-Chlrange%>%
     mutate(ymin=0, ymax=10, Quality="Bad")%>%
     bind_rows(Chlrange%>%
-                mutate(ymin=10, ymax=max(Chlsum$Chlorophyll, na.rm=T), Quality="Good"))  
+                mutate(ymin=10, ymax=max(Chlsum$Chlorophyll, na.rm=T), Quality="Good"))%>%
+    mutate(Region=factor(Region, levels=Regions)) 
   
   # Plot --------------------------------------------------------------------
   
@@ -295,7 +301,7 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
   
-  pSecchi<-plotWQ(Secchisum, Secchi_depth, "Secchi depth (cm)", paste(Secchi_season, "secchi depth", collapse=", "))+
+  pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)", paste(Secchi_season, "secchi depth", collapse=", "))+
     geom_vline(data=Secchimissing, aes(xintercept=Year), linetype=2)
   pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), paste(Chl_season, "chlorophyll", collapse=", "))+
     geom_vline(data=Chlmissing, aes(xintercept=Year), linetype=2)

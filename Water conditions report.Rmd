@@ -72,7 +72,7 @@ X2 was about average in 2018 but higher than the record low the previous year.
 WC$Temperature
 ```
 
-Delta smelt are sensitive to high water temperatures. Different life stages occur in different times of year that determine their temperature exposure. This graph displays the mean water temperature of the coldest, average, and hottest month each life stage would have experienced. Winter is defined as Dec-Mar, Spring as Apr-Jun, and Summer/fall as Jul-Nov. More detail....
+Delta smelt are sensitive to high water temperatures. This graph displays the mean water temperature of the coldest, average, and hottest months of the summer. More detail....
 
 Temperatures were low throughout the Delta in 2018, except in the Upper Sacramento.
 

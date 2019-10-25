@@ -1,4 +1,4 @@
-WCZooper<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
+WCZooper<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
   
 
 # Setup -------------------------------------------------------------------
@@ -104,7 +104,8 @@ WCZooper<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Marsh", "Lo
     droplevels()%>%
     mutate(missing="na")%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Zoopmissing<-Zoopsum%>%
     filter(missing=="n.d.")%>%

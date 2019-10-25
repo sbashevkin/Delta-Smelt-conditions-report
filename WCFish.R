@@ -1,4 +1,7 @@
-WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel")){
+WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River")){
+  
+  #No DS caught in southern delta, so removing that region
+  
   # Setup -------------------------------------------------------------------
   
   
@@ -41,15 +44,17 @@ WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Cache Slough/
     mutate(Variance=replace_na(Variance, 0))%>%
     group_by(Region, MonthYear)%>%
     summarise(Abundance=mean(Abundance, na.rm=T), Abundance_CV=sqrt((1/n()^2)*sum(Variance))/Abundance)%>%
+    ungroup()%>%
     mutate(l95=qlnorm(0.025, meanlog=log(Abundance/sqrt(1+Abundance_CV^2)), sdlog=log(1+Abundance_CV^2)),
            u95=qlnorm(0.975, meanlog=log(Abundance/sqrt(1+Abundance_CV^2)), sdlog=log(1+Abundance_CV^2)))%>%
     mutate(Abundance_l=log10(Abundance+1),
            l95_l=log10(l95),
            u95_l=log10(u95))%>%
-    filter(!(Region%in%c("Upper Sacramento", "Southern Delta")) & Region%in%EDSM_regions)%>%#No DS ever caught in these regions so removing them
+    filter(Region%in%EDSM_regions)%>%
     mutate(missing="na")%>%
     complete(MonthYear, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=EDSM_regions))
   
   EDSMmissing<-EDSM%>%
     filter(missing=="n.d.")%>%

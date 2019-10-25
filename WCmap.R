@@ -1,4 +1,4 @@
-WCmapper<-function(Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel")){
+WCmapper<-function(Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta")){
   require(sf)
   require(rgeos)
   require(rgdal)
@@ -15,14 +15,18 @@ WCmapper<-function(Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Low
   
   Deltaregions <- Deltaregions[Deltaregions@data$Stratum %in% Regions, ]
   
+  Deltaregions$Stratum<-factor(Deltaregions$Stratum, levels=Regions)
+  
   centers <- data.frame(gCentroid(Deltaregions, byid = TRUE))
   centers$region <- Deltaregions$Stratum
   
-  p<-leaflet(data=Deltaregions)%>%
-    addProviderTiles("Esri.WorldGrayCanvas")%>%setView(lng=-121.774075, lat=38.170039, zoom=11)%>%
-    addPolygons(fill = F, color = ~colorFactor(brewer.pal(8, "Dark2"), Stratum)(Stratum), smoothFactor = 0.5,
-                opacity = 1.0, fillOpacity = 0.3, weight=5)%>%
-    addLabelOnlyMarkers(data = centers, lng = ~x, lat = ~y, label = ~region, labelOptions = labelOptions(noHide = TRUE, textOnly = T, direction="right", textsize = "40px"))
+  pal<-colorFactor(brewer.pal(8, "Dark2"), Deltaregions$Stratum)
   
-  mapview::mapshot(p, file="Figures/map.png", vheight=1900, vwidth=1900)
+  p<-leaflet(data=Deltaregions)%>%
+    addProviderTiles("Esri.WorldGrayCanvas")%>%setView(lng=-121.804075, lat=38.188039, zoom=10)%>%
+    addPolygons(fillColor = ~pal(Stratum), smoothFactor = 0.5,
+                opacity = 1.0, fillOpacity = 0.3, weight=1, color = "black")%>%
+    addLegend(pal=pal, values = ~Stratum, position = "topleft", title = "Region")
+  
+  mapview::mapshot(p, file="Figures/map.png", vheight=850, vwidth=600, zoom=8)
 }

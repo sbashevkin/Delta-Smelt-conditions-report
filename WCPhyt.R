@@ -1,6 +1,6 @@
 #MISSING STATION LAT LONGS FOR SOME STATIONS
 
-WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache Slough/Liberty Island", "Suisun Marsh", "Lower Sacramento River", "Suisun Bay", "Lower Joaquin River", "Southern Delta", "Sac Deep Water Shipping Channel"), Seasons="Summer"){
+WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Summer"){
   
   
   # Setup -------------------------------------------------------------------
@@ -82,7 +82,8 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache 
            missing="na",
            Region=as.character(Region))%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%
-    mutate(missing=na_if(missing, "na"))
+    mutate(missing=na_if(missing, "na"))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   Phytomissing<-Phytosum%>%
     filter(missing=="n.d.")%>%
@@ -92,7 +93,8 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Cache 
     filter(is.na(missing))%>%
     select(-missing)
   
-  Peak<-tibble(Region=filter(Phytosum, Taxa!="Cyanobacteria")$Region[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], Year=filter(Phytosum, Taxa!="Cyanobacteria")$Year[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], label=paste0("Peak CPUE: ", format(round(max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)), big.mark=",")))
+  Peak<-tibble(Region=filter(Phytosum, Taxa!="Cyanobacteria")$Region[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], Year=filter(Phytosum, Taxa!="Cyanobacteria")$Year[which.max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)], label=paste0("Peak CPUE: ", format(round(max(filter(Phytosum, Taxa!="Cyanobacteria")$CPUE)), big.mark=",")))%>%
+    mutate(Region=factor(Region, levels=Regions))
   
   
   # Plot --------------------------------------------------------------------
