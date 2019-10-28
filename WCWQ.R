@@ -226,12 +226,10 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
   
   Tempsum<-WQsum%>%
     select(Month, Region, Temperature, Year)%>%
-    filter(!(Region%in%c("Cache Slough/Liberty Island", "Sac Deep Water Shipping Channel")))%>%
     droplevels()%>%
     group_by(Month, Year, Region)%>%
     summarise(Temperature=mean(Temperature, na.rm=T))%>%
     ungroup()%>%
-    complete(Month, Year, Region)%>%
     mutate(Season=case_when(
       Month%in%c(12,1,2) ~ "Winter",
       Month%in%c(3,4,5) ~ "Spring",
@@ -241,8 +239,10 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     )%>%
     filter(Season%in%Temp_season)%>%
     group_by(Year, Region)%>%
-    summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature))%>%
+    summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature), N=n())%>%
     ungroup()%>%
+    filter(N==3)%>%
+    select(-N)%>%
     mutate(Region=factor(Region, levels=Regions))
   
   Salrange<-Salsum%>%
@@ -273,32 +273,34 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
       theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   }
   
-  #TempShades<-expand.grid(Region=unique(WQsum$Region), Quality=c("Good", "OK", "Bad"))%>%
-  #  mutate(xmin=min(WQsum$MonthYear),
-  #         xmax=max(WQsum$MonthYear),
-  #         ymin=case_when(
-  #           Quality=="Good" ~ min(WQsum$Temperature),
-  #           Quality=="OK" ~ 20,
-  #           Quality=="Bad" ~ 26
-  #         ),
-  #         ymax=case_when(
-  #           Quality=="Good" ~ 20,
-  #           Quality=="OK" ~ 26,
-  #           Quality=="Bad" ~ max(WQsum$Temperature)
-  #         ))
+  TempShades<-expand.grid(Region=unique(Tempsum$Region), Quality=c("Good", "OK", "Bad"))%>%
+    mutate(xmin=min(Tempsum$Year)-0.5,
+           xmax=max(Tempsum$Year)+0.5,
+           ymin=case_when(
+             Quality=="Good" ~ min(Tempsum$Temperature_min),
+             Quality=="OK" ~ 20,
+             Quality=="Bad" ~ 22
+           ),
+           ymax=case_when(
+             Quality=="Good" ~ 20,
+             Quality=="OK" ~ 22,
+             Quality=="Bad" ~ max(Tempsum$Temperature_max)
+           ))
   
   pTemp<-ggplot()+
     geom_ribbon(data=Tempsum, aes(x=Year, ymin=Temperature_min, ymax=Temperature_max), alpha=0.4)+
     geom_point(data=filter(Tempsum, Year==End_year), aes(x=Year, y=Temperature_mean), color="firebrick3", size=3)+
     geom_line(data=Tempsum, aes(x=Year, y=Temperature_mean))+
-    coord_cartesian(expand=0)+
+    geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.2)+
     facet_wrap(~Region)+
+    coord_cartesian(expand=0)+
     ggtitle(paste(Temp_season, "temperature", collapse=", "))+
     ylab(bquote(Temperature~"("*degree*c*")"))+
     scale_x_continuous(breaks = seq(2000, 2020, by=5))+
+    scale_fill_brewer(type="div", palette = "RdYlBu", direction=-1)+
     xlab("Date")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"), legend.position = "none")
   
   
   pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)", paste(Secchi_season, "secchi depth", collapse=", "))+

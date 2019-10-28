@@ -78,7 +78,7 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun
     summarise(CPUE=mean(CPUE, na.rm=T))%>%
     ungroup()%>%
     filter(Year>=Start_year)%>%
-    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Green Algae", "Cryptophytes", "Chrysophytes", "Cyanobacteria", "Dinoflagellates", "Other flagellates", "Other taxa")),
+    mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Cyanobacteria", "Dinoflagellates", "Other flagellates", "Other taxa")),
            missing="na",
            Region=as.character(Region))%>%
     complete(Year, Region, fill=list(missing="n.d."))%>%

@@ -32,7 +32,8 @@ WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", 
         mutate(Source="SKT"),
       read_excel("Data/20mm DS index.xlsx")%>%
         mutate(Source="20mm"))%>%
-    filter(Year>=Start_year)
+    filter(Year>=Start_year)%>%
+    mutate(Source=factor(Source, levels=c("SKT", "STN", "20mm", "FMWT")))
   
   EDSM<-read_csv("Data/edsm_abund_estimates_2019-09-17.csv")%>%
     mutate(Stratum=recode(Stratum, "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel",
@@ -76,15 +77,15 @@ WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", 
     geom_line(data=IEP_Indices, aes(x=Year, y=Index, color=Source), size=1)+
     geom_point(data=IEP_Indices, aes(x=Year, y=Index, color=Source))+
     geom_point(data=filter(IEP_Indices, Year==End_year), aes(x=Year, y=Index, color=Source), size=3, color="firebrick3")+
-    coord_cartesian(expand=0)+
     facet_grid(Source~., scales = "free_y")+
     scale_color_brewer(type="div", palette="RdYlBu", guide="none")+
     scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    scale_y_continuous(expand=expand_scale(mult=c(0,0.05)), limits = c(0,NA))+
     ylab("Index value")+
     xlab("Date")+
     ggtitle("IEP Delta smelt index values")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), panel.spacing = unit(0.2, "in"))
   
   p$EDSM<-ggplot()+
     geom_line(data=EDSM, aes(x=MonthYear, y=Abundance_l), color="darkorchid4")+
