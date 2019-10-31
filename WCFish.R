@@ -79,7 +79,7 @@ WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", 
     geom_point(data=filter(IEP_Indices, Year==End_year), aes(x=Year, y=Index, color=Source), size=3, color="firebrick3")+
     facet_grid(Source~., scales = "free_y")+
     scale_color_brewer(type="div", palette="RdYlBu", guide="none")+
-    scale_x_continuous(labels=insert_minor(seq(1990, 2020, by=5), 4), breaks = 1990:2020)+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(expand=expand_scale(mult=c(0,0.05)), limits = c(0,NA))+
     ylab("Index value")+
     xlab("Date")+

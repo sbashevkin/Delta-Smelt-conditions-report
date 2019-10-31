@@ -12,6 +12,10 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
   require(lubridate)
   require(RColorBrewer)
   
+  insert_minor <- function(major_labs, n_minor) {labs <- 
+    c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
+  labs[1:(length(labs)-n_minor)]}
+  
   
   # Load and combine data ---------------------------------------------------
   
@@ -124,7 +128,7 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     summarise(Secchi=mean(Secchi, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"))%>%
     mutate(Region=factor(Region, levels=Regions))
   
@@ -152,7 +156,7 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     summarise(Salinity=mean(Salinity, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"))%>%
     mutate(Region=factor(Region, levels=Regions))
   
@@ -180,7 +184,7 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     summarise(Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"))%>%
     mutate(Region=factor(Region, levels=Regions))
   
@@ -211,7 +215,7 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     gather(key="Severity", value="Frequency", Microcystis1, Microcystis2, Microcystis3, Microcystis4, Microcystis5)%>%
     mutate(Severity=recode(Severity, "Microcystis1"="Absent", "Microcystis2"="Low", "Microcystis3"="Medium", "Microcystis4"="High", "Microcystis5"="Very high"))%>%
     mutate(missing="na")%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"),
            Region=factor(Region, levels=Regions))
   
@@ -243,7 +247,18 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     ungroup()%>%
     filter(N==3)%>%
     select(-N)%>%
-    mutate(Region=factor(Region, levels=Regions))
+    mutate(missing="na")%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
+    mutate(missing=na_if(missing, "na"),
+           Region=factor(Region, levels=Regions))
+  
+  Tempmissing<-Tempsum%>%
+    filter(missing=="n.d.")%>%
+    select(Year, Region)
+  
+  Tempsum<-Tempsum%>%
+    filter(is.na(missing))%>%
+    select(-missing)
   
   Salrange<-Salsum%>%
     filter(!is.na(Salinity))%>%
@@ -265,7 +280,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
       geom_line(data=Data, aes(x=Year, y=!!Parameter), color="firebrick3")+
       geom_point(data=filter(Data, Year==End_year), aes(x=Year, y=!!Parameter), color="firebrick3", size=3)+
       scale_y_continuous(expand = expand_scale(0,0))+
-      facet_wrap(~Region)+
+      scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
+      facet_wrap(~Region, scales = "free_x")+
       ylab(ylabel)+
       xlab("Date")+
       ggtitle(Title)+
@@ -274,8 +290,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
   }
   
   TempShades<-expand.grid(Region=unique(Tempsum$Region), Quality=c("Good", "OK", "Bad"))%>%
-    mutate(xmin=min(Tempsum$Year)-0.5,
-           xmax=max(Tempsum$Year)+0.5,
+    mutate(xmin=Start_year,
+           xmax=End_year+1,
            ymin=case_when(
              Quality=="Good" ~ min(Tempsum$Temperature_min),
              Quality=="OK" ~ 20,
@@ -292,37 +308,38 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     geom_point(data=filter(Tempsum, Year==End_year), aes(x=Year, y=Temperature_mean), color="firebrick3", size=3)+
     geom_line(data=Tempsum, aes(x=Year, y=Temperature_mean))+
     geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.2)+
-    facet_wrap(~Region)+
-    coord_cartesian(expand=0)+
+    geom_vline(data=Tempmissing, aes(xintercept=Year), linetype=2)+
+    facet_wrap(~Region, scales = "free_x")+
     ggtitle(paste(Temp_season, "temperature", collapse=", "))+
     ylab(bquote(Temperature~"("*degree*c*")"))+
-    scale_x_continuous(breaks = seq(2000, 2020, by=5))+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
+    scale_y_continuous(expand=expand_scale(0,0))+
     scale_fill_brewer(type="div", palette = "RdYlBu", direction=-1)+
     xlab("Date")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"), legend.position = "none")
   
   
-  pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)", paste(Secchi_season, "secchi depth", collapse=", "))+
+  pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)", paste(Secchi_season, "Secchi depth", collapse=", "))+
     geom_vline(data=Secchimissing, aes(xintercept=Year), linetype=2)
-  pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), paste(Chl_season, "chlorophyll", collapse=", "))+
+  pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), paste(Chl_season, "chlorophyll concentrations", collapse=", "))+
     geom_vline(data=Chlmissing, aes(xintercept=Year), linetype=2)
   
   pSal<-plotWQ(Salsum, Salinity, "Salinity", paste(Salinity_season, "salinity", collapse=", "))+
     geom_label(data=Salrange, aes(x=2006, y=11, label=Salrange), alpha=0.5, size=2.5)+
     geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)
   
-  ###LOOKS LIKE MICRO ONLY MEASURED IN SUMMER?
   pMicro<-ggplot()+
-    geom_bar(data=filter(Microsum, Year!=End_year), aes(x=Year, y=Frequency, fill=Severity), stat="identity", alpha=0.7)+
-    geom_bar(data=filter(Microsum, Year==End_year), aes(x=Year, y=Frequency, fill=Severity), stat="identity", alpha=1)+
+    geom_bar(data=Microsum, aes(x=Year, y=Frequency, fill=Severity), stat="identity")+
+    geom_bar(data=tibble(End_year), aes(x=End_year, y=1), stat="identity", color="firebrick3", fill=NA, size=1)+
     geom_vline(data=Micromissing, aes(xintercept=Year), linetype=2)+
     scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(keyheight=0.8, title=NULL, direction="horizontal", label.position="top", reverse=TRUE))+
-    coord_cartesian(expand=0)+
-    facet_wrap(~Region)+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
+    scale_y_continuous(expand=expand_scale(0,0))+
+    facet_wrap(~Region, scales = "free_x")+
     ylab("Relative frequency")+
     xlab("Date")+
-    ggtitle(paste(Micro_season, "Microcystis", collapse=", "))+
+    ggtitle(bquote(.(paste(Micro_season, collapse=", "))~italic(Microcystis)))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.63, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   

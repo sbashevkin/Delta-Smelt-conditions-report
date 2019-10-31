@@ -1,4 +1,4 @@
-Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River")){
+WCMetadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta")){
   
   require(sf)
   require(rgdal)
@@ -114,7 +114,7 @@ Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lo
       Month%in%c(9,10,11) ~ "Fall"),
       Year=if_else(Month==12, Year-1, Year)
     )%>%
-    select(Region, Season, Source, Chlorophyll, Salinity, Secchi, Temperature, Microcystis)%>%
+    select(Region, Season, Year, Source, Chlorophyll, Salinity, Secchi, Temperature, Microcystis)%>%
     pivot_longer(c(Chlorophyll, Salinity, Secchi, Temperature, Microcystis), names_to="Parameter", values_to = "Value")%>%
     filter(!is.na(Value))%>%
     select(-Value)
@@ -159,7 +159,7 @@ Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lo
       Month%in%c(9,10,11) ~ "Fall"),
       Year=if_else(Month==12, Year-1, Year)
     )%>%
-    select(Region, Season)%>%
+    select(Region, Season, Year)%>%
     mutate(Source="EMP",
            Parameter="Bivalves")
   
@@ -230,7 +230,7 @@ Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lo
       Year=if_else(Month==12, Year-1, Year)
     )%>%
     filter(year(MonthYear)>=Start_year)%>%
-    select(Region, Season)%>%
+    select(Region, Season, Year)%>%
     mutate(Source="EMP",
            Parameter="Zooplankton")
   
@@ -268,7 +268,7 @@ Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lo
       Month%in%c(9,10,11) ~ "Fall"),
       Year=if_else(Month==12, Year-1, Year)
     )%>%
-    select(Region, Season)%>%
+    select(Region, Season, Year)%>%
     mutate(Source="EMP",
            Parameter="Phytoplankton")
   
@@ -276,31 +276,31 @@ Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lo
 # Combine all datasets ----------------------------------------------------
 
 sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
-    group_by(Region, Season, Source, Parameter)%>%
+    group_by(Parameter)%>%
+    mutate(Years=length(unique(Year)))%>%
+    ungroup()%>%
+    group_by(Region, Season, Source, Parameter, Years)%>%
     summarise(N=n())%>%
     ungroup()%>%
-    filter(Region!="Western Delta")%>%
-    mutate(Region=factor(Region, levels=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"))) 
-  
-  Spaces<-sum%>%
-    select(Region, Season, Parameter, Source)%>%
-    crossing()%>%
-    mutate(Stations=ifelse(Parameter%in%c("Water temperature", "Secchi/turbidity"), 100, 50))
+    filter(Region%in%Regions)%>%
+    mutate(Region=factor(Region, levels=Regions),
+           Yearly_samples=N/Years,
+           Season=recode(Season, Winter="Winter\nDec - Feb", Spring="Spring\nMar - May", Summer="Summer\nJun - Aug", Fall="Fall\nSep - Nov"))
   
 
 # Plot --------------------------------------------------------------------
 
-  p<-ggplot(sum, aes(x=Region, y=N, fill=Source))+
+  p<-ggplot(sum, aes(x=Region, y=Yearly_samples, fill=Source))+
     geom_bar(stat="identity")+
-    #geom_blank(data=Spaces)+
     facet_grid(Parameter~Season, scales = "free_y")+
-    #scale_fill_viridis_d(direction=-1, option="D")+
     scale_fill_colorblind()+
     scale_y_continuous(expand = c(0,0), limits=c(0,NA))+
+    ylab("Average number of data points per year")+
     theme_bw()+
     theme(axis.text.x = element_text(angle=45, hjust=1), panel.grid=element_blank(), strip.background = element_blank(), text=element_text(size=12), plot.margin = margin(0,0,0,35), strip.text.y = element_text(angle=0, hjust=0), panel.spacing.y = unit(0.5, "lines"))
   
-  p
+  return(p)
   
   ggsave("Figures/Metadata figure.png", p, device="png", width=9, height=7)  
+  
 }

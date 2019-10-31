@@ -1,4 +1,4 @@
-WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
+WCBivalver<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Fall"){
   
   
   # Setup -------------------------------------------------------------------
@@ -11,6 +11,10 @@ WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suis
   require(readxl)
   require(lubridate)
   require(RColorBrewer)
+  
+  insert_minor <- function(major_labs, n_minor) {labs <- 
+    c( sapply( major_labs, function(x) c(x, rep("", n_minor) ) ) )
+  labs[1:(length(labs)-n_minor)]}
 
   
   # Load and combine data ---------------------------------------------------
@@ -63,7 +67,7 @@ WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suis
     ungroup()%>%
     mutate(missing="na",
            Region=as.character(Region))%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"))%>%
     mutate(Region=factor(Region, levels=Regions))
   
@@ -81,14 +85,13 @@ WCBivalver<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suis
   
   p<-ggplot()+
     geom_vline(data=Bivmissing, aes(xintercept=Year), linetype=2)+
-    geom_bar(data=filter(Bivsum, Year!=End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=0.7)+
-    geom_bar(data=filter(Bivsum, Year==End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=1)+
-    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
-    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
+    geom_bar(data=Bivsum, aes(x=Year, y=CPUE, fill=Taxa), stat="identity")+
+    geom_bar(data=Bivsum%>%filter(Year==End_year)%>%group_by(Region, Year)%>%summarise(CPUE=sum(CPUE)), aes(x=Year, y=CPUE), stat="identity", color="firebrick3", fill=NA, size=1)+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
     xlab("Date")+
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"), guide=guide_legend(title=NULL))+
-    coord_cartesian(expand=0)+
-    facet_wrap(~Region)+
+    facet_wrap(~Region, scales="free_x")+
     ggtitle(paste(Seasons, "invasive bivalve abundance", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))

@@ -81,7 +81,7 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun
     mutate(Taxa=factor(Taxa, levels=c("Diatoms", "Cryptophytes", "Green Algae", "Chrysophytes", "Cyanobacteria", "Dinoflagellates", "Other flagellates", "Other taxa")),
            missing="na",
            Region=as.character(Region))%>%
-    complete(Year, Region, fill=list(missing="n.d."))%>%
+    complete(Year=Start_year:End_year, Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"))%>%
     mutate(Region=factor(Region, levels=Regions))
   
@@ -100,17 +100,19 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun
   # Plot --------------------------------------------------------------------
   
   pphyto<-ggplot()+
-    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria" & Year!=End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=0.7)+
-    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria" & Year==End_year), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=1)+
+    geom_bar(data=filter(Phytosum, Taxa!="Cyanobacteria"), aes(x=Year, y=CPUE, fill=Taxa), stat="identity", alpha=1)+
+    {if(End_year%in%unique(Phytosum$Year)){
+      geom_bar(data=Phytosum%>%filter(Taxa!="Cyanobacteria" & Year==End_year)%>%group_by(Region, Year)%>%summarise(CPUE=sum(CPUE))%>%ungroup()%>%droplevels(), aes(x=Year, y=CPUE), stat="identity", color="firebrick3", fill=NA, size=1)
+    }}+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     geom_label(data=Peak, aes(x=Year-2, y=30000, label=label), size=3)+
     scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(keyheight=0.6, title=NULL), direction=-1)+
     xlab("Date")+
     coord_cartesian(expand=0, ylim=c(0,35000))+
-    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
-    facet_wrap(~Region)+
-    ggtitle(paste(Seasons, "phytoplankton", collapse=", "))+
+    facet_wrap(~Region, scales="free_x")+
+    ggtitle(paste(Seasons, "phytoplankton composition", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.2), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
 
@@ -119,10 +121,9 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun
   geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria" & Year==End_year), aes(x=Year, y=CPUE), fill="chartreuse4", stat="identity", alpha=1)+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     xlab("Date")+
-    scale_x_continuous(breaks = seq(1990, 2020, by=5))+
-    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
-    coord_cartesian(expand=0)+
-    facet_wrap(~Region)+
+    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
+    scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
+    facet_wrap(~Region, scales="free_x")+
     ggtitle(paste(Seasons, "cyanobacteria", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
