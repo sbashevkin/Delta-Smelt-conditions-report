@@ -1,4 +1,4 @@
-Metadater<-function(Start_year=2002){
+Metadater<-function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River")){
   
   require(sf)
   require(rgdal)
@@ -278,6 +278,7 @@ Metadater<-function(Start_year=2002){
 sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
     group_by(Region, Season, Source, Parameter)%>%
     summarise(N=n())%>%
+    ungroup()%>%
     filter(Region!="Western Delta")%>%
     mutate(Region=factor(Region, levels=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"))) 
   

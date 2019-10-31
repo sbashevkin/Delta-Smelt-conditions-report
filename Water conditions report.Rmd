@@ -40,11 +40,12 @@ FISH<-WCFisher()
 
 # Introduction
 
-Delta Smelt (*Hypomesus transpacificus*) is a pelagic species that prefers cooler temperatures in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants, and harmful algal blooms.  
+Delta Smelt (*Hypomesus transpacificus*) is a pelagic species that prefers cooler temperatures in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms. 
 
-Delta Smelt is generally described as a semi-anadromous species, migrating from brackish low salinity (1-6 PSU) habitats to tidal fresh water habitats to spawn. This spawning migration occurs in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A small proportion of the population exhibit a resident life history, residing in freshwater or brackish water to adulthood.  
+Delta Smelt is generally described as a semi-anadromous species, migrating from brackish low salinity (1-6 PSU) habitats to tidal fresh water habitats to spawn. This spawning migration occurs in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A small proportion of the population exhibit a resident life history, residing in freshwater or brackish water to adulthood. 
 
-Delta Smelt are most commonly found in the North Delta (Cache Slough/Liberty Island region) during the winter spawning season. Larval and juvenile fish start moving into the Low Salinity Zone (Suisun Bay & Marsh) during the spring and early summer and remain there until their winter spawning migration takes them back up to the North Delta. The Central and South Delta are highly modified habitats, which in combination with the proximity to the water export facilities, makes it largely unsuitable habitat. 
+Delta Smelt are most commonly found in the North Delta region (Cache Slough/Liberty Island & Sac Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish start moving into the Low Salinity Zone (Suisun Bay & Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning migration takes them back up to the North Delta. The Lower Joaquin River and Southern Delta are highly modified habitats, which in combination with the proximity to the water export facilities, makes it largely unsuitable habitat. 
+
 
 \hfill\break
 
