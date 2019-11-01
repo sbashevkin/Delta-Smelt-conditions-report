@@ -95,13 +95,13 @@ WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", 
     geom_vline(data=EDSMmissing, aes(xintercept=MonthYear), linetype=2)+
     coord_cartesian(ylim=c(2,5.7))+
     facet_wrap(~Region)+
-    scale_x_date(date_labels = "%b %y")+
+    scale_x_date(date_labels = "%b %Y", date_breaks="3 months")+
     scale_y_continuous(labels = function(x) format(10^x, scientific=F, big.mark=","))+
     ylab("Delta Smelt abundance")+
     xlab("Date")+
     ggtitle("EDSM Delta Smelt Abundance")+
     theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), axis.text.x = element_text(angle=45, hjust=1))
   
   
   

@@ -46,14 +46,14 @@ This report is intended for managers and scientists interested in tracking envir
 
 Delta Smelt is a pelagic species that prefers cooler temperatures in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
 
-Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (1-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements occurs in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
+Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (0.5-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements occurs in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
 
 Delta Smelt are most commonly found in the North Delta region (Cache Slough/Liberty Island and Sacramento River Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish move into low salinity habitat (Suisun Bay and Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning movements into fresh water. The Lower San Joaquin River and Southern Delta are highly modified habitats characterized by warm summer temperatures and low turbidities with low abundance of Delta Smelt. Proximity to the water export facilities, which may result in some probability of entrainment under some environmental conditions and operations, may also be a factor.
 
 
 \hfill\break
 
-```{r Delta Smelt photo, echo=FALSE, fig.cap="Juvenile Delta Smelt Dale Kolke / DWR", out.width="50%"}
+```{r Delta_Smelt_photo, echo=FALSE, fig.cap="Juvenile Delta Smelt Dale Kolke / DWR", out.width="55%"}
 knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 ```
 
@@ -61,24 +61,22 @@ knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 
 # Methods
 
-Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata](https://fileshare.fws.gov/?linkid=KZi4zr6VWWWg4LtQQ9RonqVHfl9A3uRc8YDODS6ncAGbVD1ekMWXqg), with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. Data from 2018 are highlighted (red dot) to facilitate comparisons across variables. Data are plotted by season with the most important season, as determined from literature, shown in this summary report. Results for the remaining seasons are available in the full report (provide link). The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previosu years.
+Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata](https://fileshare.fws.gov/?linkid=KZi4zr6VWWWg4LtQQ9RonqVHfl9A3uRc8YDODS6ncAGbVD1ekMWXqg), with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. The graphs presented in this report are for the season when a selected variable is most critical in the life history of Delta Smelt, as determined from literature. The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previous years.
 
 The data sources for each parameter, the number of data points for each region and season, and the definition of each season are shown on the next page. 
 
 \hfill\break
 
-```{r Delta map, echo=FALSE, out.height="60%"}
+```{r Delta_map, echo=FALSE, out.height="75%"}
 knitr::include_graphics("Figures/map.png")
 ```
 
 
-```{r Metadata figure, echo=FALSE, warning = FALSE, message=FALSE, error=FALSE, fig.height=9}
+```{r Metadata_figure, echo=FALSE, warning = FALSE, message=FALSE, error=FALSE, fig.height=9}
 WCMetadater()
 ```
 
-Average yearly sampling effort for each variable, region, season, and survey. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), 20-mm Survey (20mm), and the Enhanced Delta Smelt Monitoring (EDSM) program. 
-
-\hfill\break
+Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), 20-mm Survey (20mm), and the Enhanced Delta Smelt Monitoring (EDSM) program. 
 
 # Abiotic drivers
 
@@ -94,19 +92,23 @@ DF$X2
 
 X2 is a measure of the location of low salinity habitat. X2 is defined as the horizontal distance in kilometers from the Golden Gate up the axis of the estuary to where tidally averaged near-bottom salinity is 2. X2 is used as a proxy for the amount of low salinity habitat in the Delta; **lower X2 in the Fall generally means more low salinity habitat is available**. Fall months are highlighted in orange.
 
-```{r, fig.height=4}
+```{r Temperature, fig.height=7}
 WC$Temperature
 ```
 
 Delta smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures $\le$ 20 $^\circ$C**, growth likely declines at 20-22 $^\circ$C with poor growth at 22-24 $^\circ$C, and the onset of physiological stress around 24 $^\circ$C. Chronic exposure to water temperatures above 26 $^\circ$C are likely fatal. Delta smelt are rarely captured above 22 $^\circ$C. This graph displays the mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt.
 
-```{r, fig.height=3.8}
+\pagebreak
+
+```{r Secchi, fig.height=7}
 WC$Secchi
 ```
 
 Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and rely on this turbidity to effectively feed and hide from predators. 
 
-```{r, fig.height=6}
+\pagebreak
+
+```{r Salinity, fig.height=7}
 WC$Salinity
 ```
 
@@ -116,37 +118,37 @@ WC$Salinity
 
 # Biotic drivers
 
-```{r, fig.height=3.8}
+```{r Chlorophyll, fig.height=3.8}
 WC$Chlorophyll
 ```
 
 Chlorophyll is a measure of productivity at the base of the food web. **Higher chlorophyll is an indicator of more food availability for zooplankton, which are important prey for many fish, including Delta Smelt.** No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
 
-```{r}
+```{r Phytoplankton}
 PH$Phytoplankton
 ```
 
 Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for Delta Smelt. **Diatoms and cryptophytes are considered the best quality zooplankton food.** No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology.
 
-```{r, fig.height=3.6}
+```{r Cyanobacteria, fig.height=3.6}
 PH$Cyanobacteria
 ```
 
 **Cyanobacteria are an unfavorable type of phytoplankton** Cyanobacteria are considered poor quality zooplankton food and can produce toxins, such as microcystins. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology.
 
-```{r, fig.height=4.6}
+```{r Microcystis, fig.height=4.6}
 WC$Microcystis
 ```
 
 *Microcystis* is a toxin-producing cyanobacteria. The toxins, microcystins, are harmful to human and animal health. **_Microcystis_ toxins can directly harm zooplankton populations which may affect food resources for Delta Smelt.** Blooms occur yearly in the summer and fall. *Microcystis* presence and intensity are measured on a qualitative scale from 1-5.
 
-```{r, fig.height=3.9}
+```{r Zooplankton, fig.height=3.9}
 WCZooper()
 ```
 
 Delta Smelt rely on zooplankton for food throughout their entire lives. **Calanoid copepods and mysids are particularly important in the diet of Delta Smelt.** No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
 
-```{r, fig.height=4.1}
+```{r Bivalves, fig.height=4.1}
 WCBivalver()
 ```
 
@@ -154,7 +156,7 @@ WCBivalver()
 
 # Delta Smelt
 
-```{r, fig.height=6}
+```{r Delta_smelt_IEP, fig.height=6}
 FISH$IEP
 ```
 
@@ -162,7 +164,7 @@ Delta smelt abundance is estimated by 4 IEP surveys that target different life s
 
 \pagebreak
 
-```{r, fig.height=5}
+```{r Delta_Smelt_EDSM, fig.height=5}
 FISH$EDSM
 ```
 

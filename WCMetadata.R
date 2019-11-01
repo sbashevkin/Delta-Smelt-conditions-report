@@ -285,7 +285,10 @@ sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
     filter(Region%in%Regions)%>%
     mutate(Region=factor(Region, levels=Regions),
            Yearly_samples=N/Years,
-           Season=recode(Season, Winter="Winter\nDec - Feb", Spring="Spring\nMar - May", Summer="Summer\nJun - Aug", Fall="Fall\nSep - Nov"))
+           Season=factor(Season, levels=c("Winter", "Spring", "Summer", "Fall")),
+           Season=recode(Season, Winter="Winter\nDec - Feb", Spring="Spring\nMar - May", Summer="Summer\nJun - Aug", Fall="Fall\nSep - Nov"),
+           Source=recode(Source, TNS="STN"),
+           Parameter=factor(Parameter, levels=c("Temperature", "Secchi", "Salinity", "Chlorophyll", "Phytoplankton", "Microcystis", "Zooplankton", "Bivalves")))
   
 
 # Plot --------------------------------------------------------------------
@@ -293,11 +296,11 @@ sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
   p<-ggplot(sum, aes(x=Region, y=Yearly_samples, fill=Source))+
     geom_bar(stat="identity")+
     facet_grid(Parameter~Season, scales = "free_y")+
-    scale_fill_colorblind()+
+    scale_fill_colorblind(guide=guide_legend(direction="horizontal"))+
     scale_y_continuous(expand = c(0,0), limits=c(0,NA))+
     ylab("Average number of data points per year")+
     theme_bw()+
-    theme(axis.text.x = element_text(angle=45, hjust=1), panel.grid=element_blank(), strip.background = element_blank(), text=element_text(size=12), plot.margin = margin(0,0,0,35), strip.text.y = element_text(angle=0, hjust=0), panel.spacing.y = unit(0.5, "lines"))
+    theme(axis.text.x = element_text(angle=45, hjust=1), panel.grid=element_blank(), strip.background = element_blank(), text=element_text(size=12), plot.margin = margin(35,0,0,35), strip.text.y = element_text(angle=0, hjust=0), panel.spacing.y = unit(0.5, "lines"), legend.position=c(0.5, 1.1), legend.background = element_rect(color="black"))
   
   return(p)
   
