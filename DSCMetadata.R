@@ -1,10 +1,6 @@
 DSCMetadater<-function(Data, Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta")){
   
-  require(sf)
-  require(rgdal)
-  require(raster)
   require(tidyverse)
-  require(readxl)
   require(lubridate)
   require(RColorBrewer)
   require(ggthemes)

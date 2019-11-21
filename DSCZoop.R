@@ -3,10 +3,6 @@ DSCZooper<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
 
 # Setup -------------------------------------------------------------------
 
-  
-  require(sf)
-  require(rgdal)
-  require(raster)
   require(tidyverse)
   require(readxl)
   require(lubridate)
