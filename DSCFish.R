@@ -1,13 +1,9 @@
-WCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River")){
+DSCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River")){
   
   #No DS caught in southern delta, so removing that region
   
   # Setup -------------------------------------------------------------------
   
-  
-  require(sf)
-  require(rgdal)
-  require(raster)
   require(tidyverse)
   require(readxl)
   require(lubridate)

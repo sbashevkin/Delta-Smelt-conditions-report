@@ -1,4 +1,4 @@
-WCDayFlower<-function(Start_year=2002, End_year=2018){
+DSCDayFlower<-function(Start_year=2002, End_year=2018){
   
   
   # Setup -------------------------------------------------------------------

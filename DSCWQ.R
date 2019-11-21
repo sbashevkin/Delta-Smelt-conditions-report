@@ -1,14 +1,9 @@
-WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Temp_season="Summer", Secchi_season="Fall", Salinity_season="Fall", Chl_season="Summer", Micro_season="Summer"){
+DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Temp_season="Summer", Secchi_season="Fall", Salinity_season="Fall", Chl_season="Summer", Micro_season="Summer"){
   
   
   # Setup -------------------------------------------------------------------
   
-  
-  require(sf)
-  require(rgdal)
-  require(raster)
   require(tidyverse)
-  require(readxl)
   require(lubridate)
   require(RColorBrewer)
   
@@ -17,111 +12,11 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
   labs[1:(length(labs)-n_minor)]}
   
   
-  # Load and combine data ---------------------------------------------------
-  
-  
-  
-  FMWT<-read_excel("Data/FMWT 1967-2018 Catch Matrix_updated.xlsx", sheet="FlatFile", guess_max=30000)%>%
-    select(Date, Station, Conductivity=starts_with("Top EC"), Secchi=`Secchi (m)`, Microcystis, Temperature=starts_with("Top Temperature"))%>%
-    mutate(Source="FMWT",
-           Secchi=Secchi*100,
-           Microcystis=if_else(Microcystis==6, 2, Microcystis))
-  
-  STN<-read_excel("Data/STN Sample.xlsx", guess_max=10000)%>%
-    select(Date=SampleDate, Station=StationCode, Secchi, Temperature=`TemperatureTop`, Conductivity=`ConductivityTop`, Microcystis
-    )%>%
-    mutate(Source="TNS")
-  
-  EDSM<-read_csv("Data/EDSM_20mm.csv", guess_max=9000)%>%
-    select(Date, Latitude=StartLat, Longitude=StartLong, Conductivity=TopEC, Temperature=TopTemp, Secchi=Scchi)%>%
-    bind_rows(read_csv("Data/EDSM_KDTR.csv", guess_max=30000)%>%
-                select(Date, Latitude=StartLat, Longitude=StartLong, Conductivity=EC, Temperature=Temp, Secchi=Scchi))%>%
-    mutate(Secchi=Secchi*100)%>%
-    mutate(Station=paste(Latitude, Longitude),
-           Source="EDSM",
-           Date=parse_date_time(Date, "%m/%d/%Y"))%>%
-    select(-Conductivity)%>% #Methods in EDI metadata say they do not know if their data were corrected for temperature so I will not use this data
-    distinct()
-  
-  Fieldfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Field")
-  
-  Labfiles <- list.files(path = "Data/Water quality", full.names = T, pattern="Lab")
-  
-  WQ<-sapply(Fieldfiles, function(x) read_excel(x, guess_max = 5e4))%>%
-    bind_rows()%>%
-    select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult)%>%
-    filter(Parameter%in%c("Temperature", "Secchi Depth", "Conductance (EC)"))%>%
-    group_by(Date, Station, Parameter, Notes)%>%
-    summarise(Value=mean(Value, na.rm=T))%>%
-    ungroup()%>%
-    bind_rows(sapply(Labfiles, function(x) read_excel(x, guess_max = 5e4))%>%
-                bind_rows()%>%
-                select(Station=StationCode, Date=SampleDate, Parameter=ConstituentName, Value=Result, Notes=LabAnalysisRemarks)%>%
-                filter(Parameter=="Chlorophyll a")%>%
-                group_by(Date, Station, Parameter, Notes)%>%
-                summarise(Value=mean(Value, na.rm=T))%>%
-                ungroup())%>%
-    spread(key=Parameter, value=Value)%>%
-    rename(Chlorophyll=`Chlorophyll a`, Secchi=`Secchi Depth`, Conductivity=`Conductance (EC)`)%>%
-    bind_rows(read_excel("Data/EMP WQ Combined_2000-2018.xlsx", na=c("N/A", "<R.L.", "Too dark"), col_types = c(rep("text", 3), "date", rep("text", 37)))%>%
-                select(Station=`Station Name`, Date, Chlorophyll=starts_with("Chlorophyll"), Latitude=`North Latitude Degrees (d.dd)`, Longitude=`West Longitude Degrees (d.dd)`, Microcystis=`Microcystis aeruginosa`, Secchi=`Secchi Depth Centimeters`, Temperature=starts_with("Water Temperature"), Conductivity=starts_with("Specific Conductance"))%>%
-                mutate(Chlorophyll=parse_double(ifelse(Chlorophyll%in%c("<0.05", "<0.5"), 0, Chlorophyll)),
-                       Latitude=parse_double(Latitude),
-                       Longitude=parse_double(Longitude),
-                       Microcystis=parse_double(Microcystis),
-                       Secchi=parse_double(Secchi),
-                       Temperature=parse_double(Temperature),
-                       Conductivity=parse_double(Conductivity),
-                       Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))%>%
-                mutate(Microcystis=round(Microcystis))%>% #EMP has some 2.5 and 3.5 values
-                select(-Latitude, -Longitude))%>%
-    mutate(Source="EMP")%>%
-    bind_rows(FMWT, STN, EDSM%>%
-                select(-Latitude, -Longitude))%>%
-    mutate(MonthYear=floor_date(Date, unit = "month"),
-           Year=year(Date),
-           Salinity=((0.36966/(((Conductivity*0.001)^(-1.07))-0.00074))*1.28156))
-  
-  # Add regions and summarise -------------------------------------------------------------
-  
-  Stations<-read_csv("Data/Master station key.csv",
-                     col_types = "ccddc")%>%
-    select(-StationID)%>%
-    bind_rows(EDSM%>%
-                select(Latitude, Longitude, Station, Source))%>%
-    drop_na()
-  
-  #Load delta regions shapefile from Morgan
-  Deltaregions<-st_read("Data/Delta regions", quiet=T)
-  Deltaregions<-as(Deltaregions, "Spatial")
-  
-  #Match each unique region from zoop dataset to a region from the shapefile
-  Locations<-Stations
-  coordinates(Locations) <- ~Longitude+Latitude
-  proj4string(Locations) <- CRS("+proj=longlat +datum=NAD83")
-  Locations <- spTransform(Locations, proj4string(Deltaregions))
-  Locations<-Locations %over% Deltaregions
-  Stations<-Stations%>%
-    bind_cols(Locations%>%
-                dplyr::select(Region=Stratum))
-  
-  #Add regions and lat/long to zoop dataset
-  WQsum<-WQ%>%
-    filter(year(MonthYear)>=Start_year)%>%
-    left_join(Stations, by=c("Source", "Station"))%>%
-    filter(Region%in%Regions)%>%
-    mutate(Month=month(MonthYear))
+  WQsum <- Data
   
   Secchisum<-WQsum%>%
-    select(Month, Region, Secchi, Year)%>%
+    select(Month, Region, Secchi, Year, Season)%>%
     filter(!is.na(Secchi))%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
     filter(Season%in%Secchi_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
@@ -141,15 +36,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     select(-missing)
   
   Salsum<-WQsum%>%
-    select(Month, Region, Salinity, Year)%>%
+    select(Month, Region, Salinity, Year, Season)%>%
     filter(!is.na(Salinity))%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
     filter(Season%in%Salinity_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
@@ -169,15 +57,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     select(-missing)
   
   Chlsum<-WQsum%>%
-    select(Month, Region, Chlorophyll, Year)%>%
+    select(Month, Region, Chlorophyll, Year, Season)%>%
     filter(!is.na(Chlorophyll))%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
     filter(Season%in%Chl_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
@@ -197,15 +78,8 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     select(-missing)
   
   Microsum<-WQsum%>%
-    select(Month, Region, Microcystis, Year)%>%
+    select(Month, Region, Microcystis, Year, Season)%>%
     filter(!is.na(Microcystis))%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
     filter(Season%in%Micro_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
@@ -229,18 +103,11 @@ WCWQer<-function(Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun
     mutate(Severity=factor(Severity, levels=c("Very high", "High", "Medium", "Low", "Absent")))
   
   Tempsum<-WQsum%>%
-    select(Month, Region, Temperature, Year)%>%
+    select(Month, Region, Temperature, Year, Season)%>%
     droplevels()%>%
-    group_by(Month, Year, Region)%>%
+    group_by(Month, Season, Year, Region)%>%
     summarise(Temperature=mean(Temperature, na.rm=T))%>%
     ungroup()%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
     filter(Season%in%Temp_season)%>%
     group_by(Year, Region)%>%
     summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature), N=n())%>%

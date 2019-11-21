@@ -26,18 +26,21 @@ require(readxl)
 require(lubridate)
 require(RColorBrewer)
 
-source("WCWQ.R")
-source("WCFish.R")
-source("WCZoop.R")
-source("WCPhyt.R")
-source("WCDayflow.R")
-source("WCBivalves.R")
-source("WCMetadata.R")
+source("DSCWQ.R")
+source("DSCFish.R")
+source("DSCZoop.R")
+source("DSCPhyt.R")
+source("DSCDayflow.R")
+source("DSCBivalves.R")
+source("DSCMetadata.R")
+source("DSCDater.R")
 
-WC<-WCWQer()
-DF<-WCDayFlower()
-PH<-WCPhyter()
-FISH<-WCFisher()
+Data <- DSCDater()
+
+WQ<-DSCWQer(Data$Water_quality)
+DF<-DSCDayFlower()
+PH<-DSCPhyter(Data$Phytoplankton)
+FISH<-DSCFisher()
 ```
 
 # Introduction
@@ -73,7 +76,7 @@ knitr::include_graphics("Figures/map.png")
 
 
 ```{r Metadata_figure, echo=FALSE, warning = FALSE, message=FALSE, error=FALSE, fig.height=9}
-WCMetadater()
+DSCMetadater(Data)
 ```
 
 Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), 20-mm Survey (20mm), and the Enhanced Delta Smelt Monitoring (EDSM) program. 
@@ -93,7 +96,7 @@ DF$X2
 X2 is a measure of the location of low salinity habitat. X2 is defined as the horizontal distance in kilometers from the Golden Gate up the axis of the estuary to where tidally averaged near-bottom salinity is 2. X2 is used as a proxy for the amount of low salinity habitat in the Delta; **lower X2 in the Fall generally means more low salinity habitat is available**. Fall months are highlighted in orange.
 
 ```{r Temperature, fig.height=7}
-WC$Temperature
+WQ$Temperature
 ```
 
 Delta smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures $\le$ 20 $^\circ$C**, growth likely declines at 20-22 $^\circ$C with poor growth at 22-24 $^\circ$C, and the onset of physiological stress around 24 $^\circ$C. Chronic exposure to water temperatures above 26 $^\circ$C are likely fatal. Delta smelt are rarely captured above 22 $^\circ$C. This graph displays the mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt.
@@ -101,7 +104,7 @@ Delta smelt are sensitive to high water temperatures. Results from various studi
 \pagebreak
 
 ```{r Secchi, fig.height=7}
-WC$Secchi
+WQ$Secchi
 ```
 
 Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and rely on this turbidity to effectively feed and hide from predators. 
@@ -109,7 +112,7 @@ Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher tu
 \pagebreak
 
 ```{r Salinity, fig.height=7}
-WC$Salinity
+WQ$Salinity
 ```
 
 **During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities of 1-2 PSU**, are rare in salinities higher than 6 PSU, and are not found in salinities above 14 PSU. Juveniles rely on low salinity habitat in the fall to feed, grow, and mature into adults. 
@@ -119,7 +122,7 @@ WC$Salinity
 # Biotic drivers
 
 ```{r Chlorophyll, fig.height=3.8}
-WC$Chlorophyll
+WQ$Chlorophyll
 ```
 
 Chlorophyll is a measure of productivity at the base of the food web. **Higher chlorophyll is an indicator of more food availability for zooplankton, which are important prey for many fish, including Delta Smelt.** No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
@@ -137,19 +140,19 @@ PH$Cyanobacteria
 **Cyanobacteria are an unfavorable type of phytoplankton** Cyanobacteria are considered poor quality zooplankton food and can produce toxins, such as microcystins. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology.
 
 ```{r Microcystis, fig.height=4.6}
-WC$Microcystis
+WQ$Microcystis
 ```
 
 *Microcystis* is a toxin-producing cyanobacteria. The toxins, microcystins, are harmful to human and animal health. **_Microcystis_ toxins can directly harm zooplankton populations which may affect food resources for Delta Smelt.** Blooms occur yearly in the summer and fall. *Microcystis* presence and intensity are measured on a qualitative scale from 1-5.
 
 ```{r Zooplankton, fig.height=3.9}
-WCZooper()
+DSCZooper(Data$Zooplankton)
 ```
 
 Delta Smelt rely on zooplankton for food throughout their entire lives. **Calanoid copepods and mysids are particularly important in the diet of Delta Smelt.** No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
 
 ```{r Bivalves, fig.height=4.1}
-WCBivalver()
+DSCBivalver(Data$Bivalves)
 ```
 
 **Invasive bivalves (clams) consume phytoplankton and zooplankton, reducing the amount of food available for fishes.** The overbite clam *Potamocorbula amurensis* invaded the estuary in 1987, prefers brackish waters, and feeds on both zooplankton and phytoplankton. The freshwater clam *Corbicula fluminea* invaded sometime before 1945, prefers freshwater, and feeds primarily on phytoplankton but can also feed on organic material in the substrate when phytoplankton are rare. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.

@@ -1,18 +1,21 @@
+DSCStationer <- function(){
+
 #Combining Station ID sheets
+require(sf)
 require(tidyverse)
 require(readxl)
 
 FMWT<-read_excel("Data/FMWT Station.xlsx")%>%
   select(Station=StationCode, Lat, Long#, Lat2=`WGS84 Lat`, Long2=`WGS84 Long`
-         )%>%
+  )%>%
   separate(Lat, into=c("Lat_d", "Lat_m", "Lat_s"), sep="[ ]{1,}", convert=T)%>%
   separate(Long, into=c("Long_d", "Long_m", "Long_s"), sep="[ ]{1,}", convert=T)%>%
   mutate(Latitude=Lat_d+Lat_m/60+Lat_s/3600,
          Longitude=Long_d-Long_m/60-Long_s/3600,
          Source="FMWT",
          StationID=paste(Source, Station),
-  #       Lat2=parse_double(Lat2),
-  #       Long2=parse_double(Long2)
+         #       Lat2=parse_double(Lat2),
+         #       Long2=parse_double(Long2)
   )%>%
   #mutate(Latitude=if_else(is.na(Latitude), Lat2, Latitude),
   #       Longitude=if_else(is.na(Longitude), -1*Long2, Longitude))%>%
@@ -51,6 +54,21 @@ EZ<-read_excel("Data/EMP WQ Combined_2000-2018.xlsx", na=c("N/A", "<R.L.", "Too 
   mutate(StationID=paste(Source, Station))%>%
   drop_na()
 
+#EMP Bivalve stations
+
+EMPBIV <-read_excel("Data/1975-18 CPUE bivalves only, 2019Sept9.xlsx",
+                    sheet = "75-17 station locations", skip=1)%>%
+  select(Station=Site_Code, Latitude, Longitude)%>%
+  mutate(Source="EMP")%>%
+  mutate(StationID=paste(Source, Station))%>%
+  drop_na()
+
+
+#Load delta regions shapefile (EDSM 2018-19 phase I strata)
+
+Deltaregions<-read_sf("Data/Delta regions")%>%
+  st_transform(crs=4326)
+
 Stations<-bind_rows(
   Zoopxl,
   FMWT%>%
@@ -59,6 +77,16 @@ Stations<-bind_rows(
     filter(!(StationID%in%unique(Zoopxl$StationID))), 
   WQ%>%
     filter(!(StationID%in%unique(Zoopxl$StationID))),
-  EZ)
+  EZ,
+  EMPBIV)%>%
+  st_as_sf(coords = c("Longitude", "Latitude"),
+           crs=4326)%>%
+  st_join(Deltaregions, join=st_within)%>%
+  as_tibble()%>%
+  select(-geometry, -SQM)%>%
+  rename(Region=Stratum)%>%
+  drop_na()
 
 write_csv(Stations, "Data/Master station key.csv")
+
+}

@@ -1,15 +1,11 @@
 #MISSING STATION LAT LONGS FOR SOME STATIONS
 
-WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Summer"){
+DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento River", "Sac Deep Water Shipping Channel", "Cache Slough/Liberty Island", "Lower Joaquin River", "Southern Delta"), Seasons="Summer"){
   
   
   # Setup -------------------------------------------------------------------
   
-  require(sf)
-  require(rgdal)
-  require(raster)
   require(tidyverse)
-  require(readxl)
   require(lubridate)
   require(RColorBrewer)
   
@@ -19,59 +15,7 @@ WCPhyter<-function(Download=F, Start_year=2002, End_year=2018, Regions=c("Suisun
 
   # Load and combine data ---------------------------------------------------
   
-  Phyto<-read_csv("Data/Phytoplankton_Algal_Type_Data_1975_-2016.csv",
-                  col_types = "ccddddddddddddddddddd")%>%
-    rename(Date=SampleDate, Station=StationCode)%>%
-    mutate(Date=parse_date_time(Date, "mdy"))%>%
-    bind_rows(read_excel("Data/Phytoplankton 2017.xlsx")%>%
-                rename(Station=`Station Code`, Cryptophytes=Cryptomonads))%>%
-    gather(key="Taxa", value="CPUE", -Date, -Station)%>%
-    mutate(Taxa=case_when(Taxa%in%c("Centric Diatoms", "Pennate Diatoms") ~ "Diatoms",
-                          Taxa%in%c("Other flagellate", "Unknown Flagellates") ~ "Other flagellates",
-                          Taxa%in%c("Cryptophytes", "Green Algae", "Chrysophytes", "Dinoflagellates", "Cyanobacteria") ~ Taxa,
-                          TRUE ~ "Other taxa"))%>%
-    mutate(Year=year(Date),
-           MonthYear=floor_date(Date, unit = "month"),
-           Station=ifelse(Station%in%c("EZ2", "EZ6", "EZ2-SJR", "EZ6-SJR"), paste(Station, Date), Station))%>%
-    filter(Year>=2008)
-  
-  
-  # Add regions and summarise -------------------------------------------------------------
-  
-  Stations<-read_csv("Data/Master station key.csv",
-                     col_types =  "ccddc")%>%
-    drop_na()%>%
-    filter(Source=="EMP")
-  
-  #Load delta regions shapefile from Morgan
-  Deltaregions<-st_read("Data/Delta regions", quiet=T)
-  Deltaregions<-as(Deltaregions, "Spatial")
-  
-  #Match each unique region from zoop dataset to a region from the shapefile
-  Locations<-Stations
-  coordinates(Locations) <- ~Longitude+Latitude
-  proj4string(Locations) <- CRS("+proj=longlat +datum=NAD83")
-  Locations <- spTransform(Locations, proj4string(Deltaregions))
-  Locations<-Locations %over% Deltaregions
-  Stations<-Stations%>%
-    bind_cols(Locations%>%
-                dplyr::select(Region=Stratum))
-  
-  #Add regions and lat/long to phyto dataset
-  Phytosum<-Phyto%>%
-    left_join(Stations, by="Station")%>%
-    filter(Region%in%Regions)%>% 
-    group_by(Taxa, Region, Year, Date, Station)%>%
-    summarise(CPUE=sum(CPUE, na.rm=T))%>%
-    ungroup()%>%
-    mutate(Month=month(Date))%>%
-    mutate(Season=case_when(
-      Month%in%c(12,1,2) ~ "Winter",
-      Month%in%c(3,4,5) ~ "Spring",
-      Month%in%c(6,7,8) ~ "Summer",
-      Month%in%c(9,10,11) ~ "Fall"),
-      Year=if_else(Month==12, Year-1, Year)
-    )%>%
+  Phytosum<-Data%>%
     filter(Season%in%Seasons)%>%
     droplevels()%>%
     group_by(Region, Year, Taxa)%>%
