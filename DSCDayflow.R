@@ -48,7 +48,6 @@ DSCDayFlower<-function(Start_year=2002, End_year=2018){
     scale_x_datetime(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = seq(floor_date(as.POSIXct(as.character(2000), format="%Y"), "year"), floor_date(as.POSIXct(as.character(2020), format="%Y"), "year"), by="1 years"), limits=c(floor_date(as.POSIXct(as.character(Start_year), format="%Y"), "year"), floor_date(as.POSIXct(as.character(End_year), format="%Y"), "year")+years(1)), expand=expand_scale(0,0))+
     ylab("X2 (km)")+
     xlab("Date")+
-    ggtitle("X2")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   
@@ -61,11 +60,10 @@ DSCDayFlower<-function(Start_year=2002, End_year=2018){
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     ylab(bquote("Delta"~outflow~"("*ft^3*"/s)"))+
     xlab("Date")+
-    ggtitle("Delta outflow")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   
-  ggsave(p$Out, filename="Figures/Outflow.png", device = "png", width = 7.5, height=4, units="in")
-  ggsave(p$X2, filename="Figures/X2.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p$Out, filename="Figures/Outflow.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p$X2, filename="Figures/X2.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
 }
