@@ -1,5 +1,5 @@
 ---
-title: "Delta smelt conditions report (2002-present)"
+title: "Delta Smelt conditions report (2002-present)"
 author: "Delta Science Program"
 date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
@@ -107,27 +107,27 @@ Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temper
 DF$X2
 ```
 
-X2 is a measure of the location of low salinity habitat. X2 is defined as the horizontal distance in kilometers from the Golden Gate up the axis of the estuary to where tidally averaged near-bottom salinity is 2. X2 is used as a proxy for the amount of low salinity habitat in the Delta; **lower X2 in the Fall generally means more low salinity habitat is available**. 
+X2 is a measure of the location of low salinity habitat. X2 is defined as the horizontal distance in kilometers from the Golden Gate up the axis of the estuary to where tidally averaged near-bottom salinity is 2. X2 is used as a proxy for the amount of low salinity habitat in the Delta; **lower X2 in the fall generally means more low salinity habitat is available**. 
 
 ## Summer temperature
 
-```{r Temperature, fig.height=7, fig.cap="Figure 6. Mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt. Means were calculated from discrete measurements obtained by the STN, EMP, and EDSM surveys."}
+```{r Temperature, fig.height=7, fig.cap="Figure 6. Mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt. Means were calculated by pooling discrete measurements from the STN, EMP, and EDSM surveys for each month of the summer."}
 WQ$Temperature
 ```
 
-Delta smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures $\le$ 20 $^\circ$C**, growth likely declines at 20-22 $^\circ$C with poor growth at 22-24 $^\circ$C, and the onset of physiological stress around 24 $^\circ$C. Chronic exposure to water temperatures above 26 $^\circ$C are likely fatal. Delta smelt are rarely captured above 22 $^\circ$C.
+Delta Smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures $\le$ 20 $^\circ$C**, growth likely declines at 20-22 $^\circ$C with poor growth at 22-24 $^\circ$C, and the onset of physiological stress around 24 $^\circ$C. Chronic exposure to water temperatures above 26 $^\circ$C are likely fatal. Delta Smelt are rarely captured above 22 $^\circ$C.
 
 ## Secchi depth
 
-```{r Secchi, fig.height=7, fig.cap="Figure 7. Mean Fall Secchi depth from the FMWT, EMP, and EDSM surveys."}
+```{r Secchi, fig.height=7, fig.cap="Figure 7. Mean fall Secchi depth from the FMWT, EMP, and EDSM surveys. Means were calculated by pooling discrete measurements of the three surveys for the fall of each year."}
 WQ$Secchi
 ```
 
-Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and rely on this turbidity to effectively feed and hide from predators. 
+Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta Smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and rely on this turbidity to effectively feed and hide from predators. 
 
-## Fall Salinity
+## Fall salinity
 
-```{r Salinity, fig.height=7, fig.cap="Figure 8. Mean Fall salinity from the FMWT and EMP suveys."}
+```{r Salinity, fig.height=7, fig.cap="Figure 8. Mean fall salinity from the FMWT and EMP suveys. Means were calculated by pooling discrete measurements of the two surveys for the fall of each year."}
 WQ$Salinity
 ```
 
@@ -137,7 +137,7 @@ WQ$Salinity
 
 ## Summer chlorophyll concentrations
 
-```{r Chlorophyll, fig.height=3.8, fig.cap="Figure 9. Mean summer chlorophyll concentrations from EMP. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
+```{r Chlorophyll, fig.height=3.8, fig.cap="Figure 9. Mean summer chlorophyll concentrations from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
 WQ$Chlorophyll
 ```
 
@@ -145,7 +145,7 @@ Chlorophyll is a measure of productivity at the base of the food web. **Higher c
 
 ## Summer phytoplankton composition
 
-```{r Phytoplankton, fig.cap="Figure 10. Summer phytoplankton community composition from EMP. Canobacteria are presented in Fig. 11. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
+```{r Phytoplankton, fig.cap="Figure 10. Summer phytoplankton community composition from EMP. Canobacteria are presented in Fig. 11. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
 PH$Phytoplankton
 ```
 
@@ -153,7 +153,7 @@ Phytoplankton are the base of the aquatic food web. They provide food for zoopla
 
 ## Summer cyanobacteria 
 
-```{r Cyanobacteria, fig.height=3.6, fig.cap="Figure 11. Summer cyanobacteria abundance from EMP. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
+```{r Cyanobacteria, fig.height=3.6, fig.cap="Figure 11. Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
 PH$Cyanobacteria
 ```
 
@@ -161,7 +161,7 @@ PH$Cyanobacteria
 
 ## Summer *Microcystis*
 
-```{r Microcystis, fig.height=4.6, fig.cap="Figure 12. Summer Microcystis bloom intensity from EMP and STN. Microcystis bloom presence and intensity are measured on a qualitative scale from 1-5."}
+```{r Microcystis, fig.height=4.6, fig.cap="Figure 12. Summer Microcystis bloom intensity from EMP and STN. Means were calculated by pooling discrete measurements from the two surveys for the summer of each year. Microcystis bloom presence and intensity are measured on a qualitative scale from 1-5."}
 WQ$Microcystis
 ```
 
@@ -169,7 +169,7 @@ WQ$Microcystis
 
 ## Fall zooplankton
 
-```{r Zooplankton, fig.height=3.9, fig.cap="Figure 13. Fall zooplankton biomass and composition from EMP. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
+```{r Zooplankton, fig.height=3.9, fig.cap="Figure 13. Fall zooplankton biomass and composition from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
 DSCZooper(Data$Zooplankton)
 ```
 
@@ -177,25 +177,25 @@ Delta Smelt rely on zooplankton for food throughout their entire lives. **Calano
 
 ## Fall invasive bivalve abundance
 
-```{r Bivalves, fig.height=4.1, fig.cap="Figure 14. Fall abundance of two invasive bivalve species (the overbite clam *Potamocorbula amurensis* and the freshwater clam *Corbicula fluminea*). No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
+```{r Bivalves, fig.height=4.1, fig.cap="Figure 14. Fall abundance of two invasive bivalve species (the overbite clam Potamocorbula amurensis and the freshwater clam Corbicula fluminea). Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions."}
 DSCBivalver(Data$Bivalves)
 ```
 
 **Invasive bivalves (clams) consume phytoplankton and zooplankton, reducing the amount of food available for fishes.** The overbite clam *Potamocorbula amurensis* invaded the estuary in 1987, prefers brackish waters, and feeds on both zooplankton and phytoplankton. The freshwater clam *Corbicula fluminea* invaded sometime before 1945, prefers freshwater, and feeds primarily on phytoplankton but can also feed on organic material in the substrate when phytoplankton are rare. 
 
-# Delta smelt
+# Delta Smelt
 
-## IEP Delta smelt index values
+## IEP Delta Smelt index values
 
-```{r Delta_smelt_IEP, fig.height=6, fig.cap="Figure 15. Delta smelt indices from four Interagency Ecological Program (IEP) surveys: Spring Kodiak Trawl (SKT), the Summer Townet Survey (STN), the 20mm survey, and the Fall Midwater Trawl (FMWT). The 20mm index could not be calculated in 2018 due to low catch. For all surveys, indices are calculated from selected set of stations that have been consistently sampled over the full time series of the survey."}
+```{r Delta_smelt_IEP, fig.height=6, fig.cap="Figure 15. Official Delta Smelt indices from four Interagency Ecological Program (IEP) surveys: Spring Kodiak Trawl (SKT), the Summer Townet Survey (STN), the 20mm survey, and the Fall Midwater Trawl (FMWT). The 20mm index could not be calculated in 2018 due to low catch. For all surveys, indices are calculated from selected set of stations that have been consistently sampled over the full time series of the survey."}
 FISH$IEP
 ```
 
-Delta smelt abundance is estimated by 4 IEP surveys that target different life stages. The Spring Kodiak Trawl (SKT) estimates spawning adult Delta Smelt abundance from January through May, the Summer Townet Survey (STN) estimates juvenile Delta Smelt abundance in June, the 20mm survey estimates larval and juvenile Delta Smelt abundance from March through August, and the Fall Midwater Trawl (FMWT) estimates juvenile and adult Delta Smelt abundance from September through December. 
+Delta Smelt abundance is estimated by 4 IEP surveys that target different life stages. The Spring Kodiak Trawl (SKT) estimates spawning adult Delta Smelt abundance from January through May, the Summer Townet Survey (STN) estimates juvenile Delta Smelt abundance in June, the 20mm survey estimates larval and juvenile Delta Smelt abundance from March through August, and the Fall Midwater Trawl (FMWT) estimates juvenile and adult Delta Smelt abundance from September through December. 
 
-## EDSM Delta smelt abundance
+## EDSM Delta Smelt abundance
 
-```{r Delta_Smelt_EDSM, fig.height=5, fig.cap="Figure 16. Monthly Delta smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta."}
+```{r Delta_Smelt_EDSM, fig.height=5, fig.cap="Figure 16. Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta."}
 FISH$EDSM
 ```
 
