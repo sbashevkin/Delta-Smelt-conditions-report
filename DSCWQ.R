@@ -20,7 +20,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Secchi_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Secchi=mean(Secchi, na.rm=T))%>%
+    summarise(SD=sd(Secchi, na.rm=T), Secchi=mean(Secchi, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -41,7 +41,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Salinity_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Salinity=mean(Salinity, na.rm=T))%>%
+    summarise(SD=sd(Salinity, na.rm=T), Salinity=mean(Salinity, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -62,7 +62,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Chl_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
+    summarise(SD=sd(Chlorophyll, na.rm=T), Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -146,6 +146,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     Parameter<-enquo(Parameter)
     ggplot()+
       geom_line(data=Data, aes(x=Year, y=!!Parameter), color="firebrick3")+
+      geom_ribbon(data=Data, aes(x=Year, ymin=!!Parameter-SD, ymax=!!Parameter+SD), alpha=0.4, fill="gray")+
       geom_point(data=filter(Data, Year==End_year), aes(x=Year, y=!!Parameter), color="firebrick3", size=3)+
       scale_y_continuous(expand = expand_scale(0,0))+
       scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
@@ -193,8 +194,9 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     geom_vline(data=Chlmissing, aes(xintercept=Year), linetype=2)
   
   pSal<-plotWQ(Salsum, Salinity, "Salinity")+
-    geom_label(data=Salrange, aes(x=2006, y=11, label=Salrange), alpha=0.5, size=2.5)+
-    geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)
+    geom_label(data=Salrange, aes(x=2006, y=15, label=Salrange), alpha=0.5, size=2.5)+
+    geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)+
+    coord_cartesian(ylim = c(0,max(Salsum$Salinity+Salsum$SD)))
   
   pMicro<-ggplot()+
     geom_bar(data=Microsum, aes(x=Year, y=Frequency, fill=Severity), stat="identity")+
