@@ -52,6 +52,7 @@ DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
     geom_label(data=Peak, aes(x=Year-2, y=30000, label=label), size=3)+
     scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(keyheight=0.6, title=NULL), direction=-1)+
     xlab("Date")+
+    ylab("Number of cells, colonies, or filaments / ml")+
     coord_cartesian(expand=0, ylim=c(0,35000))+
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
@@ -64,6 +65,7 @@ DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
   geom_bar(data=filter(Phytosum, Taxa=="Cyanobacteria" & Year==End_year), aes(x=Year, y=CPUE), fill="chartreuse4", stat="identity", alpha=1)+
     geom_vline(data=Phytomissing, aes(xintercept=Year), linetype=2)+
     xlab("Date")+
+    ylab("Number of cells, colonies, or filaments / ml")+
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
     facet_wrap(~Region, scales="free_x")+

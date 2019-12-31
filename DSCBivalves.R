@@ -45,6 +45,7 @@ DSCBivalver<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Ba
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
     xlab("Date")+
+    ylab(bquote(Number~of~clams~"/"~m^2))+
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"), guide=guide_legend(title=NULL))+
     facet_wrap(~Region, scales="free_x")+
     theme_bw()+
