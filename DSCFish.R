@@ -79,7 +79,6 @@ DSCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay",
     scale_y_continuous(expand=expand_scale(mult=c(0,0.05)), limits = c(0,NA))+
     ylab("Index value")+
     xlab("Date")+
-    ggtitle("IEP Delta smelt index values")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), panel.spacing = unit(0.2, "in"))
   
@@ -95,15 +94,14 @@ DSCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay",
     scale_y_continuous(labels = function(x) format(10^x, scientific=F, big.mark=","))+
     ylab("Delta Smelt abundance")+
     xlab("Date")+
-    ggtitle("EDSM Delta Smelt Abundance")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), axis.text.x = element_text(angle=45, hjust=1))
   
   
   
   
-  ggsave(p$IEP, filename="Figures/IEP Fish.png", device = "png", width = 7.5, height=4, units="in")
-  ggsave(p$EDSM, filename="Figures/EDSM Fish.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p$IEP, filename="Figures/IEP Fish.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p$EDSM, filename="Figures/EDSM Fish.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
   
 }

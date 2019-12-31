@@ -56,7 +56,6 @@ DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","))+
     facet_wrap(~Region, scales="free_x")+
-    ggtitle(paste(Seasons, "phytoplankton composition", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.2), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
 
@@ -68,12 +67,11 @@ DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year-1,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
     facet_wrap(~Region, scales="free_x")+
-    ggtitle(paste(Seasons, "cyanobacteria", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
 
-  ggsave(pphyto, filename="Figures/Phytoplankton.png", device = "png", width = 7.5, height=4, units="in")
-  ggsave(pcyano, filename="Figures/Cyanobacteria.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(pphyto, filename="Figures/Phytoplankton.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(pcyano, filename="Figures/Cyanobacteria.png", device = "png", width = 7.5, height=4, units="in")
   return(list(Phytoplankton=pphyto, Cyanobacteria=pcyano))
   
 }

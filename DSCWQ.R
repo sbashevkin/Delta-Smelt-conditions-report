@@ -20,7 +20,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Secchi_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Secchi=mean(Secchi, na.rm=T))%>%
+    summarise(SD=sd(Secchi, na.rm=T), Secchi=mean(Secchi, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -41,7 +41,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Salinity_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Salinity=mean(Salinity, na.rm=T))%>%
+    summarise(SD=sd(Salinity, na.rm=T), Salinity=mean(Salinity, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -62,7 +62,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     filter(Season%in%Chl_season)%>%
     droplevels()%>%
     group_by(Region, Year)%>%
-    summarise(Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
+    summarise(SD=sd(Chlorophyll, na.rm=T), Chlorophyll=mean(Chlorophyll, na.rm=T))%>%
     ungroup()%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
@@ -100,6 +100,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
   Microsum<-Microsum%>%
     filter(is.na(missing))%>%
     select(-missing)%>%
+    filter(Severity!="Absent")%>%
     mutate(Severity=factor(Severity, levels=c("Very high", "High", "Medium", "Low", "Absent")))
   
   Tempsum<-WQsum%>%
@@ -141,17 +142,17 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
   
   # Plot --------------------------------------------------------------------
   
-  plotWQ<-function(Data, Parameter, ylabel, Title){
+  plotWQ<-function(Data, Parameter, ylabel){
     Parameter<-enquo(Parameter)
     ggplot()+
       geom_line(data=Data, aes(x=Year, y=!!Parameter), color="firebrick3")+
+      geom_ribbon(data=Data, aes(x=Year, ymin=!!Parameter-SD, ymax=!!Parameter+SD), alpha=0.4, fill="gray")+
       geom_point(data=filter(Data, Year==End_year), aes(x=Year, y=!!Parameter), color="firebrick3", size=3)+
       scale_y_continuous(expand = expand_scale(0,0))+
       scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
       facet_wrap(~Region, scales = "free_x")+
       ylab(ylabel)+
       xlab("Date")+
-      ggtitle(Title)+
       theme_bw()+
       theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   }
@@ -177,7 +178,6 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.2)+
     geom_vline(data=Tempmissing, aes(xintercept=Year), linetype=2)+
     facet_wrap(~Region, scales = "free_x")+
-    ggtitle(paste(Temp_season, "temperature", collapse=", "))+
     ylab(bquote(Temperature~"("*degree*c*")"))+
     scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(expand=expand_scale(0,0))+
@@ -187,14 +187,16 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"), legend.position = "none")
   
   
-  pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)", paste(Secchi_season, "Secchi depth", collapse=", "))+
+  pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)")+
     geom_vline(data=Secchimissing, aes(xintercept=Year), linetype=2)
-  pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"), paste(Chl_season, "chlorophyll concentrations", collapse=", "))+
+  
+  pChla<-plotWQ(Chlsum, Chlorophyll, bquote(Chlorophyll~a~"("*mu*g*"/L)"))+
     geom_vline(data=Chlmissing, aes(xintercept=Year), linetype=2)
   
-  pSal<-plotWQ(Salsum, Salinity, "Salinity", paste(Salinity_season, "salinity", collapse=", "))+
-    geom_label(data=Salrange, aes(x=2006, y=11, label=Salrange), alpha=0.5, size=2.5)+
-    geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)
+  pSal<-plotWQ(Salsum, Salinity, "Salinity")+
+    geom_label(data=Salrange, aes(x=2006, y=15, label=Salrange), alpha=0.5, size=2.5)+
+    geom_vline(data=Salmissing, aes(xintercept=Year), linetype=2)+
+    coord_cartesian(ylim = c(0,max(Salsum$Salinity+Salsum$SD)))
   
   pMicro<-ggplot()+
     geom_bar(data=Microsum, aes(x=Year, y=Frequency, fill=Severity), stat="identity")+
@@ -206,13 +208,12 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     facet_wrap(~Region, scales = "free_x")+
     ylab("Relative frequency")+
     xlab("Date")+
-    ggtitle(bquote(.(paste(Micro_season, collapse=", "))~italic(Microcystis)))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.63, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   
   plots<-list(Temperature=pTemp, Secchi=pSecchi, Salinity=pSal, Chlorophyll=pChla, Microcystis=pMicro)
   
-  sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=4, units="in"))
+  #sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=4, units="in"))
   
   return(plots)
   

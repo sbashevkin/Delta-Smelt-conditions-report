@@ -76,6 +76,6 @@ sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
   
   return(p)
   
-  ggsave("Figures/Metadata figure.png", p, device="png", width=9, height=7)  
+  #ggsave("Figures/Metadata figure.png", p, device="png", width=9, height=7)  
   
 }

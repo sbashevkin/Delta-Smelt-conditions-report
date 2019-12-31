@@ -47,11 +47,10 @@ DSCBivalver<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Ba
     xlab("Date")+
     scale_fill_manual(values=c("#d8b365", "#5ab4ac"), guide=guide_legend(title=NULL))+
     facet_wrap(~Region, scales="free_x")+
-    ggtitle(paste(Seasons, "invasive bivalve abundance", collapse=", "))+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
-  ggsave(p, filename="Figures/Bivalves.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p, filename="Figures/Bivalves.png", device = "png", width = 7.5, height=4, units="in")
   return(p)
   
 }

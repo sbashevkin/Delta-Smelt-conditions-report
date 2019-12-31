@@ -48,12 +48,11 @@ DSCZooper<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
     scale_fill_brewer(type="div", palette="BrBG", guide=guide_legend(title=NULL, keyheight=0.8))+
     scale_y_continuous(labels = function(x) format(x, scientific=F, big.mark=","), expand=expand_scale(0,0))+
     xlab("Date")+
-    ggtitle(paste(Seasons, "zooplankton", collapse=", "))+
     facet_wrap(~Region, scales="free_x")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position = c(0.85,0.2), legend.text=element_text(size=8), legend.background=element_rect(fill="white", color="black"))
   
-  ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=4, units="in")
+  #ggsave(p, filename="Figures/Zooplankton.png", device = "png", width = 7.5, height=4, units="in")
   
   return(p)
   
