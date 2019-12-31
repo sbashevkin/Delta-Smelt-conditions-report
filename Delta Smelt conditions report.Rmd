@@ -1,5 +1,7 @@
 ---
-title: "Delta Smelt conditions report (2002-present)"
+title: |
+  | Delta Smelt conditions report 
+  | (2002 - present)
 author: "Delta Science Program"
 date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
@@ -11,19 +13,30 @@ output:
 editor_options:
   chunk_output_type: console
 urlcolor: blue
+pagetitle: "Delta Smelt conditions report"
 ---
 
 <style type="text/css">
+body{ /* Normal  */
+      font-size: 16px;
+}
+h1 {
+  font-size: 2.4em;
+}
 h1.title {
+  font-size: 2.8em;
   text-align: center;
 }
 h4.author { 
+  font-size: 1.5em;
   text-align: center;
 }
 h4.date {
+  font-size: 1.5em;
   text-align: center;
 }
 h2 {
+  font-size: 2em;
   text-align: center;
 }
 p.caption {
