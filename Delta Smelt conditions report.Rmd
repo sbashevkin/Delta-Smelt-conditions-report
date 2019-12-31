@@ -112,7 +112,7 @@ X2 is a measure of the location of low salinity habitat. X2 is defined as the ho
 
 ## Summer temperature
 
-```{r Temperature, fig.height=7, fig.cap="Figure 6. Mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt. Means were calculated by pooling discrete measurements from the STN, EMP, and EDSM surveys for each month of the summer."}
+```{r Temperature, fig.height=7, fig.cap="Figure 6. Mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt. Means were calculated by pooling discrete measurements from the STN, EMP, and EDSM surveys for each month of the summer. Vertical dotted lines represent years with missing data."}
 WQ$Temperature
 ```
 
@@ -146,7 +146,7 @@ Chlorophyll is a measure of productivity at the base of the food web. **Higher c
 
 ## Summer phytoplankton composition
 
-```{r Phytoplankton, fig.cap="Figure 10. Summer phytoplankton community composition from EMP. Canobacteria are presented in Fig. 11. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
+```{r Phytoplankton, fig.cap="Figure 10. Summer phytoplankton community composition from EMP. Canobacteria are presented in Fig. 11. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data."}
 PH$Phytoplankton
 ```
 
@@ -154,7 +154,7 @@ Phytoplankton are the base of the aquatic food web. They provide food for zoopla
 
 ## Summer cyanobacteria 
 
-```{r Cyanobacteria, fig.height=3.6, fig.cap="Figure 11. Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology."}
+```{r Cyanobacteria, fig.height=3.6, fig.cap="Figure 11. Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data."}
 PH$Cyanobacteria
 ```
 
@@ -162,7 +162,7 @@ PH$Cyanobacteria
 
 ## Summer *Microcystis*
 
-```{r Microcystis, fig.height=4.6, fig.cap="Figure 12. Summer Microcystis bloom intensity from EMP and STN. Means were calculated by pooling discrete measurements from the two surveys for the summer of each year. Microcystis bloom presence and intensity are measured on a qualitative scale from 1-5."}
+```{r Microcystis, fig.height=4.6, fig.cap="Figure 12. Summer Microcystis bloom intensity from EMP and STN. Means were calculated by pooling discrete measurements from the two surveys for the summer of each year. Microcystis bloom presence and intensity are measured on a qualitative scale from 1-5. Vertical dotted lines represent years with missing data."}
 WQ$Microcystis
 ```
 
@@ -196,8 +196,8 @@ Delta Smelt abundance is estimated by 4 IEP surveys that target different life s
 
 ## EDSM Delta Smelt abundance
 
-```{r Delta_Smelt_EDSM, fig.height=5, fig.cap="Figure 16. Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta."}
+```{r Delta_Smelt_EDSM, fig.height=5, fig.cap="Figure 16. Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s."}
 FISH$EDSM
 ```
 
-EDSM is a new survey that calculates Delta Smelt abundance estimates throughout the year. __*Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s.*__ 
+EDSM is a new survey that calculates Delta Smelt abundance estimates throughout the year.
