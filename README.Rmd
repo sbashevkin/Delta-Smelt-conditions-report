@@ -1,0 +1,10 @@
+---
+title: "Delta Smelt conditions report"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Code and data used to produce [the Delta Smelt conditions report](https://sbashevkin.github.io/Delta-Smelt-conditions-report/). 
