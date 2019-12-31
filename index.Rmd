@@ -1,22 +1,10 @@
 ---
-title: "Delta Smelt conditions report"
 output: html_document
 ---
-
-<style type="text/css">
-p.caption {
-  font-size: 0.9em;
-  font-style: italic;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  text-align: center;
-}
-</style>
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The [Delta Smelt conditions report](Delta-Smelt-conditions-report.html) shows recent trends (2002 - present) in environmental conditions important for Delta Smelt. 
-
-![Juvenile Delta Smelt Dale Kolke / DWR](DBK_Delta_Smelt-2463edit.jpg)
+```{r, echo=FALSE}
+htmltools::includeHTML("Delta-Smelt-conditions-report.html")
+```
