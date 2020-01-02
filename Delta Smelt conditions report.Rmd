@@ -99,7 +99,7 @@ X2 is a measure of the location of low salinity habitat. X2 is defined as the ho
 WQ$Temperature
 ```
 
-Delta Smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures $\le$ 20 $^\circ$C**, growth likely declines at 20-22 $^\circ$C with poor growth at 22-24 $^\circ$C, and the onset of physiological stress around 24 $^\circ$C. Chronic exposure to water temperatures above 26 $^\circ$C are likely fatal. Delta Smelt are rarely captured above 22 $^\circ$C.
+Delta Smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures &le; 20 &deg;C**, growth likely declines at 20-22 &deg;C with poor growth at 22-24 &deg;C, and the onset of physiological stress around 24 &deg;C. Chronic exposure to water temperatures above 26 &deg;C are likely fatal. Delta Smelt are rarely captured above 22 &deg;C.
 
 ## Fall Secchi depth
 
