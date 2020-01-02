@@ -2,7 +2,7 @@
 title: |
   | Delta Smelt conditions report 
   | (2002 - present)
-author: "Delta Science Program"
+author: Delta Science Program
 date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
   html_document:
@@ -15,6 +15,7 @@ editor_options:
   chunk_output_type: console
 urlcolor: blue
 pagetitle: "Delta Smelt conditions report"
+lang: en
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
