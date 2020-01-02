@@ -16,7 +16,7 @@ DSCmapper<-function(Regions=c("Suisun Bay", "Suisun Marsh", "Lower Sacramento Ri
   
   Deltaregions$Stratum<-factor(Deltaregions$Stratum, levels=Regions)
   
-  pal<-colorFactor(brewer.pal(8, "Dark2"), Deltaregions$Stratum)
+  pal<-colorFactor(brewer.pal(7, "RdYlBu"), Deltaregions$Stratum)
   
   p<-leaflet(data=Deltaregions)%>%
     addProviderTiles("Esri.WorldGrayCanvas")%>%
