@@ -13,7 +13,6 @@ output:
     css: styles.css
 editor_options:
   chunk_output_type: console
-urlcolor: blue
 pagetitle: "Delta Smelt conditions report"
 lang: en
 ---
