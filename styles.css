@@ -26,3 +26,6 @@ h2 {
   padding-top: 15px;
   padding-bottom: 15px;
 }
+.list-group-item {
+  font-weight: bold;
+}
