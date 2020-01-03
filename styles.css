@@ -22,13 +22,14 @@ h2 {
 }
 .caption {
   font-size: 0.9em;
-  font-style: italic;
   padding-top: 15px;
   padding-bottom: 15px;
-}
-.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-  background-color: #122c42;
+  color: #777;
 }
 a {
   color: #531fff;
+}
+
+.book .book-header {
+  color: #1b1c1c;
 }
