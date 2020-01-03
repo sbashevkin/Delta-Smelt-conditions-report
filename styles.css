@@ -24,12 +24,13 @@ h2 {
   font-size: 0.9em;
   padding-top: 15px;
   padding-bottom: 15px;
-  color: #777;
 }
-a {
-  color: #531fff;
+.book .book-body .page-wrapper .page-inner section.normal a {
+  color: #3344dd;
 }
-
 .book .book-header {
   color: #1b1c1c;
+}
+.book .book-summary ul.summary li a:hover, .book .book-summary ul.summary li.active>a {
+  color: #3344dd;
 }
