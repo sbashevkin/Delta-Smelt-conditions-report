@@ -1,16 +1,12 @@
 ---
-title: |
-  | Delta Smelt conditions report 
-  | (2002 - present)
+title: Delta Smelt conditions report (2002 - present)
 author: Delta Science Program
 date: '`r format(Sys.Date(), "%b %d, %Y")`'
 output:
-  html_document:
-    theme: lumen
-    toc: true
-    toc_depth: 2
-    toc_float: true
-    css: styles.css
+  bookdown::gitbook:
+    split_by: none
+    number_sections: false
+    self_contained: true
 editor_options:
   chunk_output_type: console
 pagetitle: "Delta Smelt conditions report"
