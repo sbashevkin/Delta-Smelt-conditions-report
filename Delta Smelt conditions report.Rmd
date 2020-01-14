@@ -48,11 +48,11 @@ FISH<-DSCFisher()
 
 This report is intended for managers and scientists interested in tracking environmental conditions considered important for Delta Smelt (*Hypomesus transpacificus*). The variables shown in this report represent a selected subset of the variables that have been incorporated into conceptual models of Delta Smelt life history and analyses of the Delta Smelt population and its habitat. The variables selected have also been consistently measured as part of the long term monitoring efforts of the Interagency Ecological Program and other entities. Data for selected variables are summarized from 2002 to present, to reflect conditions since the beginning of the Pelagic Organism Decline. The report does not include data from short-term special studies. This report also does not provide detailed assessments of trends or the outcomes of specific management actions. Such assessments require specialized analysis and synthesis by expert teams and are beyond the scope of this report.
 
-Delta Smelt is a pelagic species that prefers cooler temperatures in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
+Delta Smelt is a pelagic species that prefers cooler temperatures (< 20 &deg;C) in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
 
-Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (0.5-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements occurs in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
+Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (0.5-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements generally occur in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
 
-Delta Smelt are most commonly found in the North Delta region (Cache Slough/Liberty Island and Sacramento River Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish move into low salinity habitat (Suisun Bay and Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning movements into fresh water. The Lower San Joaquin River and Southern Delta are highly modified habitats characterized by warm summer temperatures and low turbidities with low abundance of Delta Smelt. Proximity to the water export facilities, which may result in some probability of entrainment under some environmental conditions and operations, may also be a factor.
+Since the POD (Pelagic Organism Decline), Delta Smelt have been most commonly found in the North Delta region (Cache Slough/Liberty Island and Sacramento River Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish of the migratory life history move into low salinity habitat (Suisun Bay and Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning movements into fresh water. The Lower San Joaquin River and Southern Delta are highly modified habitats characterized by warm summer temperatures and low turbidities with low abundance of Delta Smelt. Proximity to the water export facilities, which may result in some probability of entrainment under some environmental conditions and operations, may also be a factor.
 
 <br>
 
@@ -66,7 +66,7 @@ knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 
 # Methods
 
-Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM)](https://www.fws.gov/lodi/juvenile_fish_monitoring_program/jfmp_index.htm) 2018-19 phase I strata, with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. The graphs presented in this report are for the season when a selected variable is most critical in the life history of Delta Smelt, as determined from literature. The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previous years.
+Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM)](https://www.fws.gov/lodi/juvenile_fish_monitoring_program/jfmp_index.htm) 2018-19 phase I strata, with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. The graphs presented in this report are for the season when a selected variable is most critical in the life history of Delta Smelt, as determined from literature. The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previous years. This report will be produced annually. 
 
 (ref:Deltamap) The Sacramento San Joaquin Delta divided into the EDSM 2018-19 phase I strata.
 
@@ -92,7 +92,7 @@ DSCMetadater(Data)
 DF$Out
 ```
 
-Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temperature) is determined largely by freshwater flow because Delta Smelt occupy the fresh, and low salinity portion of the SFE during the summer and fall. **High Delta outflow in the fall is believed to be favorable for Delta Smelt because it increases the amount of available low salinity habitat in Suisun Bay and Suisun Marsh.** High outflow may also improve other abiotic environmental conditions, reduce harmful algal blooms, and increase food production.
+Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temperature) is determined largely by freshwater flow because Delta Smelt occupy the fresh, and low salinity portion of the SFE during the summer and fall. **High Delta outflow in the summer/fall increases the amount of available low salinity habitat in Suisun Bay and Suisun Marsh, which is thought to be favorable for Delta Smelt.** High outflow may also improve other abiotic environmental conditions and reduce harmful algal blooms.
 
 ## X2
 
@@ -112,7 +112,7 @@ X2 is a measure of the location of low salinity habitat. X2 is defined as the ho
 WQ$Temperature
 ```
 
-Delta Smelt are sensitive to high water temperatures. Results from various studies suggest that **Delta Smelt growth is optimal at water temperatures &le; 20 &deg;C**, growth likely declines at 20-22 &deg;C with poor growth at 22-24 &deg;C, and the onset of physiological stress around 24 &deg;C. Chronic exposure to water temperatures above 26 &deg;C are likely fatal. Delta Smelt are rarely captured above 22 &deg;C.
+Delta Smelt are sensitive to high water temperatures. Results from laboratory and observational studies suggest that **Delta Smelt growth is optimal at water temperatures &le; 20 &deg;C**, growth likely declines at 20-22 &deg;C with poor growth at 22-24 &deg;C, and the onset of physiological stress around 24 &deg;C. Chronic exposure to water temperatures above 26 &deg;C are likely fatal. Delta Smelt are rarely captured above 22 &deg;C.
 
 ## Fall Secchi depth
 
@@ -122,7 +122,7 @@ Delta Smelt are sensitive to high water temperatures. Results from various studi
 WQ$Secchi
 ```
 
-Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta Smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and rely on this turbidity to effectively feed and hide from predators. 
+Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta Smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and the larvae rely on this turbidity to effectively feed and hide from predators. 
 
 ## Fall salinity
 
@@ -132,7 +132,7 @@ Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher tu
 WQ$Salinity
 ```
 
-**During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities of 1-2 PSU**, are rare in salinities higher than 6 PSU, and are not found in salinities above 14 PSU. Juveniles rely on low salinity habitat in the fall to feed, grow, and mature into adults. 
+**During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities of 1-2 PSU**, are rare in salinities higher than 6 PSU, and are not found in salinities above 14 PSU. Juveniles rely on freshwater and low salinity habitat in the fall to feed, grow, and mature into adults. 
 
 # Biotic drivers
 
@@ -154,7 +154,7 @@ Chlorophyll is a measure of productivity at the base of the food web. **Higher c
 PH$Phytoplankton
 ```
 
-Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for Delta Smelt. **Diatoms and cryptophytes are considered the best quality zooplankton food.** 
+Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for Delta Smelt. **Diatoms and cryptophytes are currently considered the best quality zooplankton food, although other taxa may be important as well.** 
 
 ## Summer cyanobacteria 
 
@@ -217,3 +217,80 @@ FISH$EDSM
 ```
 
 EDSM is a new survey that calculates Delta Smelt abundance estimates throughout the year.
+
+# Recent publications
+
+* [Directed Outflow Technical Report 1](https://www.usbr.gov/mp/bdo/directed-outflow.html)
+* [Hobs et al. 2019. Complex life histories discovered in a critically endangered fish. Scientific Reports](https://www.nature.com/articles/s41598-019-52273-8)
+* [Jin et al. 2019 Sub-lethal effects of herbicides penoxsulam, imazamox, fluridone and glyphosate on Delta Smelt (_Hypomesus transpacificus_)](https://www.sciencedirect.com/science/article/abs/pii/S0166445X18300663)
+* [Polansky et al. 2019. Using multistage design-based methods to construct abundance indices and uncertainty measures for Delta Smelt](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/tafs.10166)
+
+# Data appendix
+
+## Detailed methods {#appendix}
+
+Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest. Monthly means were calculated for outflow and X2. Annual means within each region were calculated for Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data. For temperature, we calculated the water temperatures of the hottest, average, and coldest months. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
+
+## Data sources {#appendix}
+
+Sources **bolded** below were used in the FLOAT MAST report. This section lists data sources available for all seasons. For data sources included in specific focal seasons, as well as sampling effort in each region, see the figure on page 3 of the main report.
+
+### Outflow
+
+1. **Dayflow**
+
+### X2
+
+1. **Dayflow**
+
+### Water Temperature
+
+1. EMP
+2. FMWT
+3. STN
+4. EDSM
+
+### Secchi depth
+
+1. EMP
+2. **FMWT**
+3. STN
+4. **EDSM**
+
+### Salinity
+
+1. EMP
+2. FMWT
+3. STN
+
+### Chlorophyll-a
+
+1. **EMP**
+
+### Phytoplankton
+
+1. **EMP**
+
+### Cyanobacter
+
+1. **EMP**
+
+### Microcystis
+
+1. **EMP**
+
+### Zooplankton
+
+1. **EMP**
+
+### Bivalve biomass
+
+1. **EMP**
+
+### Delta Smelt Abundance
+
+1. **FMWT**
+2. **SKT**
+3. **STN**
+4. **20mm**
+5. EDSM
