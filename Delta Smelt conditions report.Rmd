@@ -48,11 +48,11 @@ FISH<-DSCFisher()
 
 This report is intended for managers and scientists interested in tracking environmental conditions considered important for Delta Smelt (*Hypomesus transpacificus*). The variables shown in this report represent a selected subset of the variables that have been incorporated into conceptual models of Delta Smelt life history and analyses of the Delta Smelt population and its habitat. The variables selected have also been consistently measured as part of the long term monitoring efforts of the Interagency Ecological Program and other entities. Data for selected variables are summarized from 2002 to present, to reflect conditions since the beginning of the Pelagic Organism Decline. The report does not include data from short-term special studies. This report also does not provide detailed assessments of trends or the outcomes of specific management actions. Such assessments require specialized analysis and synthesis by expert teams and are beyond the scope of this report.
 
-Delta Smelt is a pelagic species that prefers cooler temperatures (< 20 &deg;C) in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
+Delta Smelt is a pelagic species that prefers cooler temperatures (< 22 &deg;C) in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
 
 Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (0.5-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements generally occur in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
 
-Since the POD (Pelagic Organism Decline), Delta Smelt have been most commonly found in the North Delta region (Cache Slough/Liberty Island and Sacramento River Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish of the migratory life history move into low salinity habitat (Suisun Bay and Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning movements into fresh water. The Lower San Joaquin River and Southern Delta are highly modified habitats characterized by warm summer temperatures and low turbidities with low abundance of Delta Smelt. Proximity to the water export facilities, which may result in some probability of entrainment under some environmental conditions and operations, may also be a factor.
+Since the POD (Pelagic Organism Decline, 2002-2003), Delta Smelt have been most commonly found in the North Delta region (Cache Slough/Liberty Island and Sacramento River Deep Water Shipping Channel) during the winter spawning season. Larval and juvenile fish of the migratory life history move into low salinity habitat (Suisun Bay and Marsh, Lower Sacramento River) during the spring and early summer and remain there until their winter spawning movements into fresh water. The Lower San Joaquin River and Southern Delta are highly modified habitats characterized by warm summer temperatures and low turbidities with low abundance of Delta Smelt. Proximity to the water export facilities, which may result in some probability of entrainment under some environmental conditions and operations, may also be a factor.
 
 <br>
 
@@ -92,7 +92,7 @@ DSCMetadater(Data)
 DF$Out
 ```
 
-Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temperature) is determined largely by freshwater flow because Delta Smelt occupy the fresh, and low salinity portion of the SFE during the summer and fall. **High Delta outflow in the summer/fall increases the amount of available low salinity habitat in Suisun Bay and Suisun Marsh, which is thought to be favorable for Delta Smelt.** High outflow may also improve other abiotic environmental conditions and reduce harmful algal blooms.
+Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temperature) is determined largely by freshwater flow because Delta Smelt occupy the fresh, and low salinity portion of the SFE during the summer and fall. **High Delta outflow in the summer-fall increases the amount of low salinity habitat available in Suisun Bay and Suisun Marsh. This is thought to be favorable for Delta Smelt.** High outflow may also improve other abiotic environmental conditions and reduce harmful algal blooms.
 
 ## X2
 
@@ -227,11 +227,11 @@ EDSM is a new survey that calculates Delta Smelt abundance estimates throughout 
 
 # Data appendix
 
-## Detailed methods {#appendix}
+## Detailed methods
 
 Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest. Monthly means were calculated for outflow and X2. Annual means within each region were calculated for Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data. For temperature, we calculated the water temperatures of the hottest, average, and coldest months. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
 
-## Data sources {#appendix}
+## Data sources
 
 Sources **bolded** below were used in the FLOAT MAST report. This section lists data sources available for all seasons. For data sources included in specific focal seasons, as well as sampling effort in each region, see the figure on page 3 of the main report.
 
