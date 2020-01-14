@@ -220,10 +220,28 @@ EDSM is a new survey that calculates Delta Smelt abundance estimates throughout 
 
 # Recent publications
 
+* [Castillo et al. 2019. Evaluation of chromatophores as natural marks for delta smelt: the effects of life-stage and light intensity. Environmental Biology of Fishes](https://link.springer.com/article/10.1007/s10641-019-00893-4)
+* [Castillo 2019. Modeling the influence of outflow and community structure on an endangered fish population in the upper San Francisco estuary. Water](https://www.mdpi.com/2073-4441/11/6/1162)
+* [Davis et al. 2019. Sensitivities of an endemic, endangered California smelt and two non-native fishes to serial increases in temperature and salinity: implications for shifting community structure with climate change. Conservation Physiology](https://academic.oup.com/conphys/article/7/1/coy076/5334620)
+* [Davis et al. 2019. Consequences of temperature and temperature variability on swimming activity, group structure, and predation of endangered delta smelt. Freshwater Biology](https://onlinelibrary.wiley.com/doi/abs/10.1111/fwb.13403)
 * [Directed Outflow Technical Report 1](https://www.usbr.gov/mp/bdo/directed-outflow.html)
-* [Hobs et al. 2019. Complex life histories discovered in a critically endangered fish. Scientific Reports](https://www.nature.com/articles/s41598-019-52273-8)
+* [Hammock et al. 2019. Tidal wetlands associated with foraging success of Delta Smelt. Estuaries and Coasts](https://link.springer.com/article/10.1007/s12237-019-00521-5)
+* [Hobbs et al. 2019. Complex life histories discovered in a critically endangered fish. Scientific Reports](https://www.nature.com/articles/s41598-019-52273-8)
+* [Hung et al. 2019. A pilot study of the performance of captive-reared delta smelt _Hypomesus transpacificus_ in a semi-natural environment](https://onlinelibrary.wiley.com/doi/full/10.1111/jfb.14162)
 * [Jin et al. 2019 Sub-lethal effects of herbicides penoxsulam, imazamox, fluridone and glyphosate on Delta Smelt (_Hypomesus transpacificus_)](https://www.sciencedirect.com/science/article/abs/pii/S0166445X18300663)
-* [Polansky et al. 2019. Using multistage design-based methods to construct abundance indices and uncertainty measures for Delta Smelt](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/tafs.10166)
+* [Kimerer et al. 2019. Effects of drought and the emergency drought barrier on the ecosystem of the California delta. San Francisco Estuary and Watershed Sciences](https://escholarship.org/uc/item/0b3731ph)
+* [Lindberg et al. 2020. Spawning microhabitat selection in wild-caught Delta Smelt _Hypomesus transpacificus_ under laboratory conditions. Estuaries and Coasts](https://link.springer.com/article/10.1007/s12237-019-00672-5)
+* [Mahardja et al. 2019. Role of freshwater floodplain-tidal slough complex in the persistence of the endangered Delta Smelt. PLOS ONE](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0208084)
+* [Mitchell et al. 2019. Estimating the size selectivity of fishing trawls for a short-lived fish species. San Francisco Estuary and Watershed Sciences](https://escholarship.org/uc/item/0hh7n9x2)
+* [Murphy and Weiland 2019. The low-salinity zone in the San Francisco Estuary as a proxy for delta smelt habitat: A case study in the misuse of surrogates in conservation planning. Ecological Indicators](https://www.sciencedirect.com/science/article/pii/S1470160X1930398X)
+* [Polansky et al. 2019. Using multistage design-based methods to construct abundance indices and uncertainty measures for Delta Smelt. Transactions of the American Fisheries Society](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/tafs.10166)
+* [Romney et al. 2019. Developmental staging and salinity tolerance in embryos of the delta smelt, _Hypomesus transpacificus_. Aquaculture](https://www.sciencedirect.com/science/article/abs/pii/S0044848619301425)
+* [Sandford et al. 2019. A review of fish identification methods applied on small fish. Reviews in Aquaculture](https://onlinelibrary.wiley.com/doi/abs/10.1111/raq.12339)
+* [Simonis and Merz 2019. Prey availability, environmental constraints, and aggregation dictate population distribution of an imperiled fish. Ecosphere](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecs2.2634)
+* [Smith 2019. Integration of transport, survival, and sampling efficiency in a model of south delta entrainment. San Francisco Estuary and Watershed Sciences](https://escholarship.org/uc/item/893826f3)
+* [Tamburello et al. 2019. Durability of environment–recruitment relationships in aquatic ecosystems: insights from long-term monitoring in a highly modified estuary and implications for management. Limnology and Oceanography](https://aslopubs.onlinelibrary.wiley.com/doi/full/10.1002/lno.11037)
+* [Weinersmith et al. 2019. Diets of Largemouth Bass (_Micropterus salmoides_) in the Sacramento–San Joaquin Delta. San Francisco Estuary and Watershed Sciences](https://escholarship.org/uc/item/9mn0v9qb)
+* [Willmes et al. 2019. Calibrating temperature reconstructions from fish otolith oxygen isotope analysis for California's critically endangered Delta Smelt. Rapid Communications in Mass Spectrometry](https://onlinelibrary.wiley.com/doi/abs/10.1002/rcm.8464)
 
 # Data appendix
 
