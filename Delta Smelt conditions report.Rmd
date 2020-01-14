@@ -188,7 +188,7 @@ Delta Smelt rely on zooplankton for food throughout their entire lives. **Calano
 
 ## Fall invasive bivalve abundance
 
-(ref:Bivalves) Fall abundance of two invasive bivalve species (the overbite clam *Potamocorbula amurensis* and the freshwater clam *Corbicula fluminea*). Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
+(ref:Bivalves) Fall abundance of two invasive bivalve species (the overbite clam *Potamocorbula amurensis* and the freshwater clam *Corbicula fluminea*) from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
 
 ```{r Bivalves, fig.height=4.1, fig.cap="(ref:Bivalves)"}
 DSCBivalver(Data$Bivalves)
