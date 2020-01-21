@@ -24,6 +24,7 @@ require(readxl)
 require(lubridate)
 require(RColorBrewer)
 require(ggthemes)
+require(knitr)
 
 source("DSCWQ.R")
 source("DSCFish.R")
@@ -59,7 +60,7 @@ Since the POD (Pelagic Organism Decline, 2002-2003), Delta Smelt have been most 
 (ref:DeltaSmeltphoto) Juvenile Delta Smelt Dale Kolke / DWR.
 
 ```{r DeltaSmeltphoto, echo=FALSE, fig.cap="(ref:DeltaSmeltphoto)", out.width="55%"}
-knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
+include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 ```
 
 
@@ -68,10 +69,10 @@ knitr::include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 
 Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM)](https://www.fws.gov/lodi/juvenile_fish_monitoring_program/jfmp_index.htm) 2018-19 phase I strata, with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. The graphs presented in this report are for the season when a selected variable is most critical in the life history of Delta Smelt, as determined from literature. The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previous years. This report will be produced annually. 
 
-(ref:Deltamap) The Sacramento San Joaquin Delta divided into the EDSM 2018-19 phase I strata.
+(ref:Deltamap) The Sacramento San Joaquin Delta divided into the EDSM 2018-19 phase I strata (Suisun Bay, Suisun Marsh, Lower Sacramento River, Sacramento Deep Water Shipping Channel, Cache Slough/Liberty Island, Lower San Joaquin River, and the Southern Delta). 
 
 ```{r Deltamap, echo=FALSE, out.width="55%", fig.cap="(ref:Deltamap)"}
-knitr::include_graphics("Figures/map.png")
+include_graphics("Figures/map.png")
 ```
 
 
