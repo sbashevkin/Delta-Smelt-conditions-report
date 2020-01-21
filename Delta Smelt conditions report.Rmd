@@ -106,7 +106,7 @@ X2 is a measure of the location of low salinity habitat. X2 is defined as the ho
 
 ## Summer temperature
 
-(ref:Temperature) Mean water temperature of the coldest (bottom of gray shading), average (black line), and hottest (top of gray shading) months of the summer, shaded by suitability for Delta Smelt. Means were calculated by pooling discrete measurements from the STN, EMP, and EDSM surveys for each month of the summer. Vertical dotted lines represent years with missing data.
+(ref:Temperature) Mean summer water temperature from discrete measurements collected by the STN, EMP, and EDSM surveys, shaded by suitability for Delta Smelt (bottom blue section under 20 &deg;C = good, middle yellow section between 20 and 22 &deg;C  = OK, top red section over 22 &deg;C = bad). Gray shading represents the standard deviation across all measurements from the summer of each year. Vertical dotted lines represent years with missing data.
 
 ```{r Temperature, fig.height=7, fig.cap="(ref:Temperature)"}
 WQ$Temperature
@@ -148,7 +148,7 @@ Chlorophyll is a measure of productivity at the base of the food web. **Higher c
 
 ## Summer phytoplankton composition
 
-(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Canobacteria are presented in Fig. \@ref(fig:Cyanobacteria). Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data.
+(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Canobacteria are presented in <a href="#fig:Cyanobacteria"> figure 11</a>. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data.
 
 ```{r Phytoplankton, fig.cap="(ref:Phytoplankton)"}
 PH$Phytoplankton
@@ -247,11 +247,11 @@ EDSM is a new survey that calculates Delta Smelt abundance estimates throughout 
 
 ## Detailed methods
 
-Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest. Annual means within each region were calculated for Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data. Monthly means were calculated for outflow and X2. For temperature, we calculated the water temperatures of the hottest, average, and coldest months. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
+Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Temperature, Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest, then annual means within each region were calculated. Monthly means were calculated for outflow and X2. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
 
 ## Data sources
 
-Sources **bolded** below were used in the FLOAT MAST report. This section lists data sources available for all seasons. For data sources included in specific focal seasons, as well as sampling effort in each region, see fig. \@ref(fig:Metadatafigure).
+Sources **bolded** below were used in the FLOAT MAST report. This section lists data sources available for all seasons. For data sources included in specific focal seasons, as well as sampling effort in each region, see <a href="#fig:Metadatafigure"> figure 3</a>.
 
 ### Outflow
 

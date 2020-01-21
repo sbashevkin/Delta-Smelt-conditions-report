@@ -105,16 +105,13 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
   
   Tempsum<-WQsum%>%
     select(Month, Region, Temperature, Year, Season)%>%
+    filter(Season%in%Temp_season & !is.na(Temperature))%>%
     droplevels()%>%
-    group_by(Month, Season, Year, Region)%>%
-    summarise(Temperature=mean(Temperature, na.rm=T))%>%
-    ungroup()%>%
-    filter(Season%in%Temp_season)%>%
     group_by(Year, Region)%>%
-    summarise(Temperature_max=max(Temperature), Temperature_min=min(Temperature), Temperature_med=median(Temperature), Temperature_mean=mean(Temperature), N=n())%>%
+    mutate(Nmonths = n_distinct(Month))%>%
+    filter(Nmonths>=3)%>%
+    summarise(SD=sd(Temperature, na.rm=T), Temperature=mean(Temperature, na.rm=T))%>%
     ungroup()%>%
-    filter(N==3)%>%
-    select(-N)%>%
     mutate(missing="na")%>%
     complete(Year=Start_year:(End_year), Region, fill=list(missing="n.d."))%>%
     mutate(missing=na_if(missing, "na"),
@@ -161,31 +158,22 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     mutate(xmin=Start_year,
            xmax=End_year+1,
            ymin=case_when(
-             Quality=="Good" ~ min(Tempsum$Temperature_min),
+             Quality=="Good" ~ min(Tempsum$Temperature-Tempsum$SD),
              Quality=="OK" ~ 20,
              Quality=="Bad" ~ 22
            ),
            ymax=case_when(
              Quality=="Good" ~ 20,
              Quality=="OK" ~ 22,
-             Quality=="Bad" ~ max(Tempsum$Temperature_max)
+             Quality=="Bad" ~ max(Tempsum$Temperature+Tempsum$SD)
            ))
   
-  pTemp<-ggplot()+
-    geom_ribbon(data=Tempsum, aes(x=Year, ymin=Temperature_min, ymax=Temperature_max), alpha=0.4)+
-    geom_point(data=filter(Tempsum, Year==End_year), aes(x=Year, y=Temperature_mean), color="firebrick3", size=3)+
-    geom_line(data=Tempsum, aes(x=Year, y=Temperature_mean))+
-    geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.2)+
-    geom_vline(data=Tempmissing, aes(xintercept=Year), linetype=2)+
-    facet_wrap(~Region, scales = "free_x")+
-    ylab(bquote(Temperature~"("*degree*c*")"))+
-    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
-    scale_y_continuous(expand=expand_scale(0,0))+
-    scale_fill_brewer(type="div", palette = "RdYlBu", direction=-1)+
-    xlab("Date")+
-    theme_bw()+
-    theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"), legend.position = "none")
   
+  pTemp<-plotWQ(Tempsum, Temperature, bquote(Temperature~"("*degree*c*")"))+
+    geom_vline(data=Tempmissing, aes(xintercept=Year), linetype=2)+
+    geom_rect(data=TempShades, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, fill=Quality), alpha=0.2)+
+    scale_fill_brewer(type="div", palette = "RdYlBu", direction=-1)+
+    theme(legend.position = "none")
   
   pSecchi<-plotWQ(Secchisum, Secchi, "Secchi depth (cm)")+
     geom_vline(data=Secchimissing, aes(xintercept=Year), linetype=2)
