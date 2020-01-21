@@ -75,7 +75,22 @@ knitr::include_graphics("Figures/map.png")
 ```
 
 
-(ref:Metadatafigure) Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), 20-mm Survey (20mm), and the Enhanced Delta Smelt Monitoring (EDSM) program.
+## Sampling programs
+
+```{r}
+knitr::kable(tibble(Acronym = c("EMP", "FMWT", "SKT", "STN", "20mm", "EDSM", "Dayflow"), `Dataset name` = c("Environmental Monitoring Program", "Fall Midwater Trawl", "Spring Kodiak Trawl", "Summer Townet", "20 mm Survey", "Enhanced Delta Smelt Monitoring", "Dayflow"), Agency = c("California Department of Fish and Wildlife; Department of Water Resources", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "United States Fish and Wildlife Service", "Department of Water Resources")), caption = "Acronyms and responsible agencies for each dataset used in this report.")
+```
+
+
+## Definitions of seasons
+
+```{r}
+knitr::kable(tibble(Season = c("Winter", "Spring", "Summer", "Fall"), Months = c("December (of prior year), January, February", "March, April, May", "June, July, August", "September, October, November")), caption = "Definitions of seasons as used in this report.")
+```
+
+## Sampling effort
+
+(ref:Metadatafigure) Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by FMWT, SKT, STN, 20mm, and EDSM.
 
 
 ```{r Metadatafigure, echo=FALSE, warning = FALSE, message=FALSE, error=FALSE, fig.height=8, fig.cap="(ref:Metadatafigure)"}
