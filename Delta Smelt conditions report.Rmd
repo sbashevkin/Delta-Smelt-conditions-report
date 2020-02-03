@@ -63,7 +63,7 @@ BIV <- DSCBivalver(Data$Bivalves)
 
 # Accessibility
 
-For any assistance accessing the map, graphs, images, or other material in this report, please contact us at [DeltaSmeltReport@deltacouncil.ca.gov](mailto:DeltaSmeltReport@deltacouncil.ca.gov)
+For any assistance accessing the map, graphs, images, or other material in this report, please contact us at [DeltaSmeltReport@deltacouncil.ca.gov](mailto:DeltaSmeltReport@deltacouncil.ca.gov).
 
 # Introduction
 
@@ -162,7 +162,7 @@ Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher tu
 
 ## Fall salinity
 
-(ref:Salinity) Mean fall salinity from the FMWT and EMP suveys. Means were calculated by pooling discrete measurements of the two surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year. Raw data are available in <a href="#tab:Salinitydata"> table 7.</a>
+(ref:Salinity) Mean fall salinity from the FMWT and EMP surveys. Means were calculated by pooling discrete measurements of the two surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year. Raw data are available in <a href="#tab:Salinitydata"> table 7.</a>
 
 ```{r Salinity, fig.height=7, fig.cap="(ref:Salinity)"}
 WQ$Salinity$Plot
@@ -184,7 +184,7 @@ Chlorophyll is a measure of productivity at the base of the food web. **Higher c
 
 ## Summer phytoplankton composition
 
-(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Canobacteria are presented in <a href="#fig:Cyanobacteria"> figure 11</a>. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
+(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Cyanobacteria are presented in <a href="#fig:Cyanobacteria"> figure 11</a>. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the time frame of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
 
 ```{r Phytoplankton, fig.cap="(ref:Phytoplankton)"}
 PH$Plots$Phytoplankton
@@ -194,7 +194,7 @@ Phytoplankton are the base of the aquatic food web. They provide food for zoopla
 
 ## Summer cyanobacteria 
 
-(ref:Cyanobacteria) Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
+(ref:Cyanobacteria) Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the time frame of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
 
 ```{r Cyanobacteria, fig.height=3.6, fig.cap="(ref:Cyanobacteria)"}
 PH$Plots$Cyanobacteria
@@ -246,7 +246,7 @@ Delta Smelt abundance is estimated by 4 IEP surveys that target different life s
 
 ## EDSM Delta Smelt abundance
 
-(ref:DeltasmeltEDSM) Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s. Raw data are available in <a href="#tab:DeltasmeltEDSMdata"> table 14.</a>
+(ref:DeltasmeltEDSM) Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Monitoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s. Raw data are available in <a href="#tab:DeltasmeltEDSMdata"> table 14.</a>
 
 ```{r DeltasmeltEDSM, fig.height=5, fig.cap="(ref:DeltasmeltEDSM)"}
 FISH$EDSM$Plot
@@ -283,7 +283,7 @@ EDSM is a new survey that calculates Delta Smelt abundance estimates throughout 
 
 ## Detailed methods
 
-Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Temperature, Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest, then annual means within each region were calculated. Monthly means were calculated for outflow and X2. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiac Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
+Data collected from 2002 - present within our regional strata were included in this report. We used regional strata from the Enhanced Delta Smelt Monitoring (EDSM) 2018-19 phase I strata. The Western Delta region was excluded because it is almost never occupied by Delta Smelt. Temperature, Secchi depth, salinity, chlorophyll, phytoplankton, cyanobacteria, zooplankton, and bivalve data were first filtered to only include data within the season of interest, then annual means within each region were calculated. Monthly means were calculated for outflow and X2. The relative frequencies of Microcystis index values (1-5) were calculated for each year and region. Official Delta Smelt indices were used from the Fall Midwater Trawl (FMWT), Spring Kodiak Trawl (SKT), Summer Townet (STN), and 20-mm (20mm) surveys. Official abundance estimates from EDSM were averaged monthly within each region and confidence intervals were calculated based on the lognormal distribution as described in Polansky et al. (2019). 
 
 ## Data sources
 
@@ -325,7 +325,7 @@ Sources **bolded** below were used in the FLOAT MAST report. This section lists 
 
 1. **EMP**
 
-### Cyanobacter
+### Cyanobacteria
 
 1. **EMP**
 
