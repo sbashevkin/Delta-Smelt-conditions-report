@@ -74,7 +74,12 @@ sum<-bind_rows(WQsum, Bivsum, Zoopsum, Phytosum)%>%
     theme_bw()+
     theme(axis.text.x = element_text(angle=45, hjust=1), panel.grid=element_blank(), strip.background = element_blank(), text=element_text(size=12), plot.margin = margin(35,0,0,35), strip.text.y = element_text(angle=0, hjust=0), panel.spacing.y = unit(0.5, "lines"), legend.position=c(0.5, 1.1), legend.background = element_rect(color="black"))
   
-  return(p)
+  Data_out <- sum%>%
+    mutate(Yearly_samples = round(Yearly_samples, 2),
+           Season = recode(Season, "Winter\nDec - Feb"="Winter", "Spring\nMar - May"="Spring", "Summer\nJun - Aug"="Summer", "Fall\nSep - Nov"="Fall"))%>%
+    rename(`Total samples`=N, `Samples per year` = Yearly_samples, `Years sampled` = Years)
+  
+  return(list(Plot=p, Data=Data_out))
   
   #ggsave("Figures/Metadata figure.png", p, device="png", width=9, height=7)  
   

@@ -51,7 +51,11 @@ DSCBivalver<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Ba
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), legend.position = c(0.85, 0.2), plot.title = element_text(hjust = 0.5, size=20), legend.background=element_rect(fill="white", color="black"))
   
+  Data_out <- Bivsum%>%
+    mutate(CPUE=round(CPUE,2))%>%
+    rename(`Count per unit effort` = CPUE)
+  
   #ggsave(p, filename="Figures/Bivalves.png", device = "png", width = 7.5, height=4, units="in")
-  return(p)
+  return(list(Plot = p, Data = Data_out))
   
 }

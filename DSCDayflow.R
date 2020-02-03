@@ -63,7 +63,14 @@ DSCDayFlower<-function(Start_year=2002, End_year=2018){
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   
+  Data_out <- DF%>%
+    mutate(Month = month(MonthYear),
+           Year = year(MonthYear),
+           OUT = round(OUT, 2),
+           X2 = round(X2, 2))%>%
+    select(Month, Year, Outflow=OUT, X2)
+  
   #ggsave(p$Out, filename="Figures/Outflow.png", device = "png", width = 7.5, height=4, units="in")
   #ggsave(p$X2, filename="Figures/X2.png", device = "png", width = 7.5, height=4, units="in")
-  return(p)
+  return(list(Plots=p, Data=Data_out))
 }

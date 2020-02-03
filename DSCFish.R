@@ -29,7 +29,8 @@ DSCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay",
       read_excel("Data/20mm DS index.xlsx")%>%
         mutate(Source="20mm"))%>%
     filter(Year>=Start_year)%>%
-    mutate(Source=factor(Source, levels=c("SKT", "STN", "20mm", "FMWT")))
+    mutate(Source=factor(Source, levels=c("SKT", "STN", "20mm", "FMWT")))%>%
+    select(Year, Source, Index)
   
   EDSM<-read_csv("Data/edsm_abund_estimates_2019-09-17.csv")%>%
     mutate(Stratum=recode(Stratum, "Cache Slough LI"="Cache Slough/Liberty Island", "Sac DW Ship Channel"="Sac Deep Water Shipping Channel",
@@ -97,11 +98,17 @@ DSCFisher<-function(Start_year=2002, End_year=2018, EDSM_regions=c("Suisun Bay",
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), axis.text.x = element_text(angle=45, hjust=1))
   
-  
+  EDSM_out <- EDSM%>%
+    mutate(Month=month(MonthYear),
+           Year=year(MonthYear),
+           Abundance=round(Abundance, 2),
+           l95 = round(l95, 2),
+           u95 = round(u95, 2))%>%
+    select(Month, Year, `Estimated abundance` = Abundance, `Lower 95% CI` = l95, `Upper 95% CI` = u95)
   
   
   #ggsave(p$IEP, filename="Figures/IEP Fish.png", device = "png", width = 7.5, height=4, units="in")
   #ggsave(p$EDSM, filename="Figures/EDSM Fish.png", device = "png", width = 7.5, height=4, units="in")
-  return(p)
+  return(list(IEP = list(Plot = p$IEP, Data = IEP_Indices), EDSM= list(Plot = p$EDSM, Data = EDSM_out)))
   
 }

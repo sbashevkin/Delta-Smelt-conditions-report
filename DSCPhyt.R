@@ -71,9 +71,13 @@ DSCPhyter<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay"
     facet_wrap(~Region, scales="free_x")+
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
+  
+  Data_out <- Phytosum%>%
+    mutate(CPUE=round(CPUE,2))%>%
+    rename(`Count per unit effort` = CPUE)
 
   #ggsave(pphyto, filename="Figures/Phytoplankton.png", device = "png", width = 7.5, height=4, units="in")
   #ggsave(pcyano, filename="Figures/Cyanobacteria.png", device = "png", width = 7.5, height=4, units="in")
-  return(list(Phytoplankton=pphyto, Cyanobacteria=pcyano))
+  return(list(Plots = list(Phytoplankton = pphyto, Cyanobacteria = pcyano), Data = Data_out))
   
 }

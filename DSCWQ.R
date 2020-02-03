@@ -199,7 +199,28 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     theme_bw()+
     theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20), legend.position=c(0.63, 0.13), legend.background=element_rect(fill="white", color="black"), legend.text = element_text(size=8))
   
-  plots<-list(Temperature=pTemp, Secchi=pSecchi, Salinity=pSal, Chlorophyll=pChla, Microcystis=pMicro)
+  Datacleaner<-function(Data, Parameter){
+    Parameter <- enquo(Parameter)
+    out <- Data%>%
+      mutate(SD=round(SD, 2),
+             !!Parameter := round(!!Parameter, 2))%>%
+      select(Year, Region, `Standard deviation` = SD, !!Parameter)
+    return(out)
+  }
+  
+  Tempdata <- Datacleaner(Tempsum, Temperature)
+  Secchidata <- Datacleaner(Secchisum, Secchi)
+  Saldata <- Datacleaner(Salsum, Salinity)
+  Chldata <- Datacleaner(Chlsum, Chlorophyll)
+  Microdata <- Microsum%>%
+    mutate(Frequency = round(Frequency, 2))%>%
+    rename(Samples = N_Microcystis, `Relative frequency`=Frequency)
+  
+  plots<-list(Temperature = list(Plot = pTemp, Data = Tempdata), 
+              Secchi = list(Plot = pSecchi, Data = Secchidata),
+              Salinity = list(Plot = pSal, Data = Saldata),
+              Chlorophyll = list(Plot = pChla, Data = Chldata),
+              Microcystis = list(Plot = pMicro, Data = Microdata))
   
   #sapply(1:length(plots), function(x) ggsave(plots[[x]], filename=paste0("Figures/", names(plots[x]), ".png"), device = "png", width = 7.5, height=4, units="in"))
   

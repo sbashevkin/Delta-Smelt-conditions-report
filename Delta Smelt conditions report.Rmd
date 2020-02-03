@@ -25,6 +25,19 @@ require(lubridate)
 require(RColorBrewer)
 require(ggthemes)
 require(knitr)
+require(DT)
+
+create_dt <- function(x, caption=NULL){
+  DT::datatable(x,
+                rownames = FALSE,
+                caption = caption,
+                extensions = 'Buttons',
+                options = list(dom = 'Blfrtip',
+                               buttons = c('csv'),
+                               lengthMenu = list(c(10,25,50,-1),
+                                                 c(10,25,50,"All")),
+                               columnDefs = list(list(className = 'dt-right', targets="_all"))))
+}
 
 source("DSCWQ.R")
 source("DSCFish.R")
@@ -37,13 +50,20 @@ source("DSCDater.R")
 
 Data <- DSCDater()
 
-WQ<-DSCWQer(Data$Water_quality)
-DF<-DSCDayFlower()
-PH<-DSCPhyter(Data$Phytoplankton)
-FISH<-DSCFisher()
+WQ <- DSCWQer(Data$Water_quality)
+DF <- DSCDayFlower()
+PH <- DSCPhyter(Data$Phytoplankton)
+FISH <- DSCFisher()
+META <- DSCMetadater(Data)
+ZOOP <- DSCZooper(Data$Zooplankton)
+BIV <- DSCBivalver(Data$Bivalves)
 ```
 
 <br>
+
+# Accessibility
+
+For any assistance accessing the map, graphs, images, or other material in this report, please contact us at [DeltaSmeltReport@deltacouncil.ca.gov](mailto:DeltaSmeltReport@deltacouncil.ca.gov)
 
 # Introduction
 
@@ -69,7 +89,7 @@ include_graphics("DBK_Delta_Smelt-2463edit.jpg")
 
 Most variables are divided among 7 of the 8 regions from the [Enhanced Delta Smelt Monitoring (EDSM)](https://www.fws.gov/lodi/juvenile_fish_monitoring_program/jfmp_index.htm) 2018-19 phase I strata, with the Western Delta region excluded because it is almost never occupied by Delta Smelt. Missing data are denoted by vertical dashed lines. Data are plotted from 2002 (or the start of data collection) until present. The graphs presented in this report are for the season when a selected variable is most critical in the life history of Delta Smelt, as determined from literature. The graphs also highlight in red the most recent year, to facilitate visual comparisons of recent conditions with previous years. This report will be produced annually. 
 
-(ref:Deltamap) The Sacramento San Joaquin Delta divided into the EDSM 2018-19 phase I strata (Suisun Bay, Suisun Marsh, Lower Sacramento River, Sacramento Deep Water Shipping Channel, Cache Slough/Liberty Island, Lower San Joaquin River, and the Southern Delta). 
+(ref:Deltamap) The Sacramento San Joaquin Delta divided into the EDSM 2018-19 phase I strata (Suisun Bay, Suisun Marsh, Lower Sacramento River, Sacramento Deep Water Shipping Channel, Cache Slough/Liberty Island, Lower San Joaquin River, and the Southern Delta).
 
 ```{r Deltamap, echo=FALSE, out.width="55%", fig.cap="(ref:Deltamap)"}
 include_graphics("Figures/map.png")
@@ -78,74 +98,74 @@ include_graphics("Figures/map.png")
 
 ## Sampling programs
 
-```{r}
-knitr::kable(tibble(Acronym = c("EMP", "FMWT", "SKT", "STN", "20mm", "EDSM", "Dayflow"), `Dataset name` = c("Environmental Monitoring Program", "Fall Midwater Trawl", "Spring Kodiak Trawl", "Summer Townet", "20 mm Survey", "Enhanced Delta Smelt Monitoring", "Dayflow"), Agency = c("California Department of Fish and Wildlife; Department of Water Resources", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "United States Fish and Wildlife Service", "Department of Water Resources")), caption = "Acronyms and responsible agencies for each dataset used in this report.")
+```{r Sampleprog}
+knitr::kable(tibble(Acronym = c("EMP", "FMWT", "SKT", "STN", "20mm", "EDSM", "Dayflow"), `Dataset name` = c("Environmental Monitoring Program", "Fall Midwater Trawl", "Spring Kodiak Trawl", "Summer Townet", "20 mm Survey", "Enhanced Delta Smelt Monitoring", "Dayflow"), Agency = c("California Department of Fish and Wildlife; Department of Water Resources", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "California Department of Fish and Wildlife", "United States Fish and Wildlife Service", "Department of Water Resources")), caption="Acronyms and responsible agencies for each dataset used in this report.")
 ```
 
 
 ## Definitions of seasons
 
-```{r}
+```{r Seasons}
 knitr::kable(tibble(Season = c("Winter", "Spring", "Summer", "Fall"), Months = c("December (of prior year), January, February", "March, April, May", "June, July, August", "September, October, November")), caption = "Definitions of seasons as used in this report.")
 ```
 
 ## Sampling effort
 
-(ref:Metadatafigure) Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by FMWT, SKT, STN, 20mm, and EDSM.
+(ref:Metadatafigure) Average yearly sampling effort for each variable, region, season, and survey. Cyanobacteria data are included in the phytoplankton category. Delta Outflow and X2 are derived from the Dayflow model while Delta Smelt abundance is represented by the official indices produced by FMWT, SKT, STN, 20mm, and EDSM. Raw data are available in <a href="#tab:Metadatadata"> table 3.</a>
 
 
-```{r Metadatafigure, echo=FALSE, warning = FALSE, message=FALSE, error=FALSE, fig.height=8, fig.cap="(ref:Metadatafigure)"}
-DSCMetadater(Data)
+```{r Metadatafigure, echo=FALSE, fig.height=8, fig.cap="(ref:Metadatafigure)"}
+META$Plot
 ```
 
 # Abiotic drivers
 
 ## Delta outflow
 
-(ref:Outflow) Monthly modeled Delta outflow from the Dayflow model. Fall months are highlighted in orange.
+(ref:Outflow) Monthly modeled Delta outflow from the Dayflow model. Fall months are highlighted in orange. Raw data are available in <a href="#tab:Dayflowdata"> table 4.</a>
 
 ```{r Outflow, fig.height=3.7, fig.cap="(ref:Outflow)"}
-DF$Out
+DF$Plots$Out
 ```
 
 Delta Smelt abiotic habitat (as defined by salinity, turbidity, and water temperature) is determined largely by freshwater flow because Delta Smelt occupy the fresh, and low salinity portion of the SFE during the summer and fall. **High Delta outflow in the summer-fall increases the amount of low salinity habitat available in Suisun Bay and Suisun Marsh. This is thought to be favorable for Delta Smelt.** High outflow may also improve other abiotic environmental conditions and reduce harmful algal blooms.
 
 ## X2
 
-(ref:X2) Monthly modeled X2 from the Dayflow model. Fall months are highlighted in orange.
+(ref:X2) Monthly modeled X2 from the Dayflow model. Fall months are highlighted in orange. Raw data are available in <a href="#tab:Dayflowdata"> table 4.</a>
 
 ```{r X2, fig.height=3.7, fig.cap="(ref:X2)"}
-DF$X2
+DF$Plots$X2
 ```
 
 X2 is a measure of the location of low salinity habitat. X2 is defined as the horizontal distance in kilometers from the Golden Gate up the axis of the estuary to where tidally averaged near-bottom salinity is 2. X2 is used as a proxy for the amount of low salinity habitat in the Delta; **lower X2 in the fall generally means more low salinity habitat is available**. 
 
 ## Summer temperature
 
-(ref:Temperature) Mean summer water temperature from discrete measurements collected by the STN, EMP, and EDSM surveys, shaded by suitability for Delta Smelt (bottom blue section under 20 &deg;C = good, middle yellow section between 20 and 22 &deg;C  = OK, top red section over 22 &deg;C = bad). Gray shading represents the standard deviation across all measurements from the summer of each year. Vertical dotted lines represent years with missing data.
+(ref:Temperature) Mean summer water temperature from discrete measurements collected by the STN, EMP, and EDSM surveys, shaded by suitability for Delta Smelt (bottom blue section under 20 &deg;C = good, middle yellow section between 20 and 22 &deg;C  = OK, top red section over 22 &deg;C = bad). Gray shading represents the standard deviation across all measurements from the summer of each year. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Temperaturedata"> table 5.</a>
 
 ```{r Temperature, fig.height=7, fig.cap="(ref:Temperature)"}
-WQ$Temperature
+WQ$Temperature$Plot
 ```
 
 Delta Smelt are sensitive to high water temperatures. Results from laboratory and observational studies suggest that **Delta Smelt growth is optimal at water temperatures &le; 20 &deg;C**, growth likely declines at 20-22 &deg;C with poor growth at 22-24 &deg;C, and the onset of physiological stress around 24 &deg;C. Chronic exposure to water temperatures above 26 &deg;C are likely fatal. Delta Smelt are rarely captured above 22 &deg;C.
 
 ## Fall Secchi depth
 
-(ref:Secchi) Mean fall Secchi depth from the FMWT, EMP, and EDSM surveys. Means were calculated by pooling discrete measurements of the three surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year.
+(ref:Secchi) Mean fall Secchi depth from the FMWT, EMP, and EDSM surveys. Means were calculated by pooling discrete measurements of the three surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year. Raw data are available in <a href="#tab:Secchidata"> table 6.</a>
 
 ```{r Secchi, fig.height=7, fig.cap="(ref:Secchi)"}
-WQ$Secchi
+WQ$Secchi$Plot
 ```
 
 Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher turbidity, which is preferred by Delta Smelt**. Delta Smelt distributions are clustered around areas with low Secchi depth (high turbidity) in the fall. Delta Smelt evolved in the historically turbid San Francisco Estuary and the larvae rely on this turbidity to effectively feed and hide from predators. 
 
 ## Fall salinity
 
-(ref:Salinity) Mean fall salinity from the FMWT and EMP suveys. Means were calculated by pooling discrete measurements of the two surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year.
+(ref:Salinity) Mean fall salinity from the FMWT and EMP suveys. Means were calculated by pooling discrete measurements of the two surveys for the fall of each year. Gray shading represents the standard deviation across all measurements from the fall of each year. Raw data are available in <a href="#tab:Salinitydata"> table 7.</a>
 
 ```{r Salinity, fig.height=7, fig.cap="(ref:Salinity)"}
-WQ$Salinity
+WQ$Salinity$Plot
 ```
 
 **During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities of 1-2 PSU**, are rare in salinities higher than 6 PSU, and are not found in salinities above 14 PSU. Juveniles rely on freshwater and low salinity habitat in the fall to feed, grow, and mature into adults. 
@@ -154,60 +174,60 @@ WQ$Salinity
 
 ## Summer chlorophyll concentrations
 
-(ref:Chlorophyll) Mean summer chlorophyll concentrations from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Gray shading represents the standard deviation across all measurements from the summer of each year.
+(ref:Chlorophyll) Mean summer chlorophyll concentrations from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Gray shading represents the standard deviation across all measurements from the summer of each year. Raw data are available in <a href="#tab:Chlorophylldata"> table 8.</a>
 
 ```{r Chlorophyll, fig.height=3.8, fig.cap="(ref:Chlorophyll)"}
-WQ$Chlorophyll
+WQ$Chlorophyll$Plot
 ```
 
 Chlorophyll is a measure of productivity at the base of the food web. **Higher chlorophyll is an indicator of more food availability for zooplankton, which are important prey for many fish, including Delta Smelt.** 
 
 ## Summer phytoplankton composition
 
-(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Canobacteria are presented in <a href="#fig:Cyanobacteria"> figure 11</a>. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data.
+(ref:Phytoplankton) Summer phytoplankton community composition from EMP. Canobacteria are presented in <a href="#fig:Cyanobacteria"> figure 11</a>. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
 
 ```{r Phytoplankton, fig.cap="(ref:Phytoplankton)"}
-PH$Phytoplankton
+PH$Plots$Phytoplankton
 ```
 
 Phytoplankton are the base of the aquatic food web. They provide food for zooplankton, which are important prey for Delta Smelt. **Diatoms and cryptophytes are currently considered the best quality zooplankton food, although other taxa may be important as well.** 
 
 ## Summer cyanobacteria 
 
-(ref:Cyanobacteria) Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data.
+(ref:Cyanobacteria) Summer cyanobacteria abundance from EMP. Means were calculated by pooling discrete measurements for the summer of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Data are only shown from 2008 - 2018 to reflect the timeframe of consistent sample processing methodology. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Phytodata"> table 9.</a>
 
 ```{r Cyanobacteria, fig.height=3.6, fig.cap="(ref:Cyanobacteria)"}
-PH$Cyanobacteria
+PH$Plots$Cyanobacteria
 ```
 
 **Cyanobacteria are an unfavorable type of phytoplankton** Cyanobacteria are considered poor quality zooplankton food and can produce toxins, such as microcystins. 
 
 ## Summer *Microcystis*
 
-(ref:Microcystis) Summer *Microcystis* bloom intensity from EMP and STN. Means were calculated by pooling discrete measurements from the two surveys for the summer of each year. *Microcystis* bloom presence and intensity are measured on a qualitative scale with 5 categories: absent, low (widely scattered colonies), medium (adjacent colonies), high (contiguous colonies), and very high (concentration of contiguous colonies forming mats/scum). Vertical dotted lines represent years with missing data.
+(ref:Microcystis) Summer *Microcystis* bloom intensity from EMP and STN. Means were calculated by pooling discrete measurements from the two surveys for the summer of each year. *Microcystis* bloom presence and intensity are measured on a qualitative scale with 5 categories: absent, low (widely scattered colonies), medium (adjacent colonies), high (contiguous colonies), and very high (concentration of contiguous colonies forming mats/scum). Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Microcystisdata"> table 10.</a>
 
 ```{r Microcystis, fig.height=4.6, fig.cap="(ref:Microcystis)"}
-WQ$Microcystis
+WQ$Microcystis$Plot
 ```
 
 *Microcystis* is a toxin-producing cyanobacteria. The toxins, microcystins, are harmful to human and animal health. **_Microcystis_ toxins can directly harm zooplankton populations which may affect food resources for Delta Smelt.** Blooms occur yearly in the summer and fall. 
 
 ## Fall zooplankton
 
-(ref:Zooplankton) Fall zooplankton biomass and composition from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
+(ref:Zooplankton) Fall zooplankton biomass and composition from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Raw data are available in <a href="#tab:Zooplanktondata"> table 11.</a>
 
 ```{r Zooplankton, fig.height=3.9, fig.cap="(ref:Zooplankton)"}
-DSCZooper(Data$Zooplankton)
+ZOOP$Plot
 ```
 
 Delta Smelt rely on zooplankton for food throughout their entire lives. **Calanoid copepods and mysids are particularly important in the diet of Delta Smelt.**
 
 ## Fall invasive bivalve abundance
 
-(ref:Bivalves) Fall abundance of two invasive bivalve species (the overbite clam *Potamocorbula amurensis* and the freshwater clam *Corbicula fluminea*) from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions.
+(ref:Bivalves) Fall abundance of two invasive bivalve species (the overbite clam *Potamocorbula amurensis* and the freshwater clam *Corbicula fluminea*) from EMP. Means were calculated by pooling discrete measurements for the fall of each year. No data are available from the Sac Deep Water Shipping Channel or Cache/Slough/Liberty Island regions. Raw data are available in <a href="#tab:Bivalvedata"> table 12.</a>
 
 ```{r Bivalves, fig.height=4.1, fig.cap="(ref:Bivalves)"}
-DSCBivalver(Data$Bivalves)
+BIV$Plot
 ```
 
 **Invasive bivalves (clams) consume phytoplankton and zooplankton, reducing the amount of food available for fishes.** The overbite clam *Potamocorbula amurensis* invaded the estuary in 1987, prefers brackish waters, and feeds on both zooplankton and phytoplankton. The freshwater clam *Corbicula fluminea* invaded sometime before 1945, prefers freshwater, and feeds primarily on phytoplankton but can also feed on organic material in the substrate when phytoplankton are rare. 
@@ -216,20 +236,20 @@ DSCBivalver(Data$Bivalves)
 
 ## IEP Delta Smelt index values
 
-(ref:DeltasmeltIEP) Official Delta Smelt indices from four Interagency Ecological Program (IEP) surveys: Spring Kodiak Trawl (SKT), the Summer Townet Survey (STN), the 20mm survey, and the Fall Midwater Trawl (FMWT). The 20mm index could not be calculated in 2018 due to low catch. For all surveys, indices are calculated from selected set of stations that have been consistently sampled over the full time series of the survey.
+(ref:DeltasmeltIEP) Official Delta Smelt indices from four Interagency Ecological Program (IEP) surveys: Spring Kodiak Trawl (SKT), the Summer Townet Survey (STN), the 20mm survey, and the Fall Midwater Trawl (FMWT). The 20mm index could not be calculated in 2018 due to low catch. For all surveys, indices are calculated from selected set of stations that have been consistently sampled over the full time series of the survey. Raw data are available in <a href="#tab:DeltasmeltIEPdata"> table 13.</a>
 
 ```{r DeltasmeltIEP, fig.height=6, fig.cap="(ref:DeltasmeltIEP)"}
-FISH$IEP
+FISH$IEP$Plot
 ```
 
-Delta Smelt abundance is estimated by 4 IEP surveys that target different life stages. The Spring Kodiak Trawl (SKT) estimates spawning adult Delta Smelt abundance from January through May, the Summer Townet Survey (STN) estimates juvenile Delta Smelt abundance in June, the 20mm survey estimates larval and juvenile Delta Smelt abundance from March through August, and the Fall Midwater Trawl (FMWT) estimates juvenile and adult Delta Smelt abundance from September through December. 
+Delta Smelt abundance is estimated by 4 IEP surveys that target different life stages. The Spring Kodiak Trawl (SKT) estimates spawning adult Delta Smelt abundance from January through May, the Summer Townet Survey (STN) estimates juvenile Delta Smelt abundance in June, the 20mm survey estimates larval and juvenile Delta Smelt abundance from March through August, and the Fall Midwater Trawl (FMWT) estimates juvenile and adult Delta Smelt abundance from September through December.
 
 ## EDSM Delta Smelt abundance
 
-(ref:DeltaSmeltEDSM) Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s.
+(ref:DeltasmeltEDSM) Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Montoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s. Raw data are available in <a href="#tab:DeltasmeltEDSMdata"> table 14.</a>
 
-```{r DeltaSmeltEDSM, fig.height=5, fig.cap="(ref:DeltaSmeltEDSM)"}
-FISH$EDSM
+```{r DeltasmeltEDSM, fig.height=5, fig.cap="(ref:DeltasmeltEDSM)"}
+FISH$EDSM$Plot
 ```
 
 EDSM is a new survey that calculates Delta Smelt abundance estimates throughout the year.
@@ -328,3 +348,113 @@ Sources **bolded** below were used in the FLOAT MAST report. This section lists 
 3. **STN**
 4. **20mm**
 5. EDSM
+
+## Raw data
+
+### Sampling effort
+
+```{r Metadatadata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Metadatadata)", "Data from <a href='#fig:Metadatafigure'> figure 3.</a>", "</caption>"),"</table>", sep ="\n")
+
+create_dt(META$Data)
+```
+
+### Outflow and X2
+
+```{r Dayflowdata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Dayflowdata)", "Data from <a href='#fig:Outflow'> figure 4</a> and <a href='#fig:X2'> figure 5.</a> Outflow is in ft<sup>3</sup>/s and X2 is in km.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(DF$Data)
+```
+
+### Summer temperature
+
+```{r Temperaturedata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Temperaturedata)", "Data from <a href='#fig:Temperature'> figure 6.</a> Standard deviation and temperature are in &deg;C. Temperatures under 20 &deg;C are good, between 20 and 22 &deg;C are OK, and over 22 &deg;C are bad for Delta Smelt.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(WQ$Temperature$Data)
+```
+
+### Fall Secchi depth
+
+```{r Secchidata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Secchidata)", "Data from <a href='#fig:Secchi'> figure 7.</a> Standard deviation and Secchi depth are in cm.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(WQ$Secchi$Data)
+```
+
+### Fall salinity
+
+```{r Salinitydata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Salinitydata)", "Data from <a href='#fig:Salinity'> figure 8.</a>", "</caption>"),"</table>", sep ="\n")
+
+create_dt(WQ$Salinity$Data)
+```
+
+### Summer chlorophyll concentration
+
+```{r Chlorophylldata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Chlorophylldata)", "Data from <a href='#fig:Chlorophyll'> figure 9.</a> Standard deviation and chlorophyll are in &micro;g/L.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(WQ$Chl$Data)
+```
+
+### Summer phytoplankton and cyanobacteria
+
+```{r Phytodata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Phytodata)", "Data from <a href='#fig:Phytoplankton'> figure 10</a> and <a href='#fig:Cyanobacteria'> figure 11.</a> Count per unit effort represents the number of cells, colonies, or filaments / ml.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(PH$Data)
+```
+
+### Summer *Microcystis*
+
+```{r Microcystisdata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Microcystisdata)", "Data from <a href='#fig:Microcystis'> figure 12.</a>", "</caption>"),"</table>", sep ="\n")
+
+create_dt(WQ$Microcystis$Data)
+```
+
+### Fall zooplankton
+
+```{r Zooplanktondata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Zooplanktondata)", "Data from <a href='#fig:Zooplankton'> figure 13.</a> Biomass per unit effort is in &micro;g/m<sup>3</sup>.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(ZOOP$Data)
+```
+
+### Fall invasive bivalve abundance
+
+```{r Bivalvedata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:Bivalvedata)", "Data from <a href='#fig:Bivalves'> figure 14.</a> Count per unit effort represents the number of clams/m<sup>2</sup>.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(BIV$Data)
+```
+
+### IEP Delta Smelt Index Values
+
+```{r DeltasmeltIEPdata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:DeltasmeltIEPdata)", "Data from <a href='#fig:DeltasmeltIEP'> figure 15.</a>", "</caption>"),"</table>", sep ="\n")
+
+create_dt(FISH$IEP$Data)
+```
+
+### EDSM Delta Smelt Index Values
+
+```{r DeltasmeltEDSMdata, results="asis", echo=FALSE}
+
+cat("<table>",paste0("<caption>", "(#tab:DeltasmeltEDSMdata)", "Data from <a href='#fig:DeltasmeltEDSM'> figure 16.</a> CI indicates confidence intervals.", "</caption>"),"</table>", sep ="\n")
+
+create_dt(FISH$EDSM$Data)
+```
