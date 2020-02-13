@@ -142,8 +142,7 @@ DSCDater <- function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "L
   # Load and combine data ---------------------------------------------------
   
   # Deltaregions for EDSM data
-  Deltaregions<-read_sf("Data/Delta regions")%>%
-    st_transform(crs=4326)
+  Deltaregions<-read_sf("Data/Delta regions")
   
   FMWT<-read_excel("Data/FMWT 1967-2018 Catch Matrix_updated.xlsx", sheet="FlatFile", guess_max=30000)%>%
     select(Date, Station, Conductivity=starts_with("Top EC"), Secchi=`Secchi (m)`, Microcystis, Temperature=starts_with("Top Temperature"))%>%
@@ -169,6 +168,7 @@ DSCDater <- function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "L
     filter(!is.na(Latitude) & !is.na(Longitude))%>%
     st_as_sf(coords = c("Longitude", "Latitude"), #Add regions to EDSM data
              crs=4326)%>%
+    st_transform(crs=st_crs(Deltaregions))%>%
     st_join(Deltaregions, join=st_within)%>%
     as_tibble()%>%
     select(-geometry, -SQM)%>%

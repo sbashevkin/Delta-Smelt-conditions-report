@@ -66,8 +66,7 @@ EMPBIV <-read_excel("Data/1975-18 CPUE bivalves only, 2019Sept9.xlsx",
 
 #Load delta regions shapefile (EDSM 2018-19 phase I strata)
 
-Deltaregions<-read_sf("Data/Delta regions")%>%
-  st_transform(crs=4326)
+Deltaregions<-read_sf("Data/Delta regions")
 
 Stations<-bind_rows(
   Zoopxl,
@@ -81,6 +80,7 @@ Stations<-bind_rows(
   EMPBIV)%>%
   st_as_sf(coords = c("Longitude", "Latitude"),
            crs=4326)%>%
+  st_transform(crs=st_crs(Deltaregions))%>%
   st_join(Deltaregions, join=st_within)%>%
   as_tibble()%>%
   select(-geometry, -SQM)%>%
