@@ -69,7 +69,7 @@ For any assistance accessing the map, graphs, images, or other material in this 
 
 This report is intended for managers and scientists interested in tracking environmental conditions considered important for Delta Smelt (*Hypomesus transpacificus*). The variables shown in this report represent a selected subset of the variables that have been incorporated into conceptual models of Delta Smelt life history and analyses of the Delta Smelt population and its habitat. The variables selected have also been consistently measured as part of the long term monitoring efforts of the Interagency Ecological Program and other entities. Data for selected variables are summarized from 2002 to present, to reflect conditions since the beginning of the Pelagic Organism Decline. The report does not include data from short-term special studies. This report also does not provide detailed assessments of trends or the outcomes of specific management actions. Such assessments require specialized analysis and synthesis by expert teams and are beyond the scope of this report.
 
-Delta Smelt is a pelagic species that prefers cooler temperatures (< 22 &deg;C) in low salinity, turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
+Delta Smelt is a pelagic species that prefers cooler temperatures (< 22 &deg;C) in low salinity (0 - 6), turbid habitats. Some additional habitat concerns are food availability, invasive species, contaminants and harmful algal blooms.
 
 Delta Smelt is generally described as a semi-anadromous species, moving from brackish low salinity (0.5-6 PSU) habitats to tidal fresh water habitats to spawn; however, the species expresses a variety of life histories. These spawning movements generally occur in the winter, after the “first-flush” of turbid freshwater following the first major precipitation event. A variable proportion of the population also exhibit resident life histories, residing in freshwater or brackish water for their entire life cycle.
 
@@ -142,7 +142,7 @@ X2 is a measure of the location of low salinity habitat. X2 is defined as the ho
 
 ## Summer temperature
 
-(ref:Temperature) Mean summer water temperature from discrete measurements collected by the STN, EMP, and EDSM surveys, shaded by suitability for Delta Smelt (bottom blue section under 20 &deg;C = good, middle yellow section between 20 and 22 &deg;C  = OK, top red section over 22 &deg;C = bad). Gray shading represents the standard deviation across all measurements from the summer of each year. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Temperaturedata"> table 5.</a>
+(ref:Temperature) Mean summer water temperature from discrete measurements collected by the STN, EMP, and EDSM surveys, shaded by suitability for Delta Smelt (bottom blue section under 20 &deg;C = good, middle yellow section between 20 and 22 &deg;C  = marginal, top red section over 22 &deg;C = bad). Gray shading represents the standard deviation across all measurements from the summer of each year. Vertical dotted lines represent years with missing data. Raw data are available in <a href="#tab:Temperaturedata"> table 5.</a>
 
 ```{r Temperature, fig.height=7, fig.cap="(ref:Temperature)"}
 WQ$Temperature$Plot
@@ -373,7 +373,7 @@ create_dt(DF$Data)
 
 ```{r Temperaturedata, results="asis", echo=FALSE}
 
-cat("<table>",paste0("<caption>", "(#tab:Temperaturedata)", "Data from <a href='#fig:Temperature'> figure 6.</a> Standard deviation and temperature are in &deg;C. Temperatures under 20 &deg;C are good, between 20 and 22 &deg;C are OK, and over 22 &deg;C are bad for Delta Smelt.", "</caption>"),"</table>", sep ="\n")
+cat("<table>",paste0("<caption>", "(#tab:Temperaturedata)", "Data from <a href='#fig:Temperature'> figure 6.</a> Standard deviation and temperature are in &deg;C. Temperatures under 20 &deg;C are good, between 20 and 22 &deg;C are marginal, and over 22 &deg;C are bad for Delta Smelt.", "</caption>"),"</table>", sep ="\n")
 
 create_dt(WQ$Temperature$Data)
 ```

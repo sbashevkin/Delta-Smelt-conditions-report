@@ -154,17 +154,17 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
       theme(panel.grid=element_blank(), strip.background = element_blank(), plot.title = element_text(hjust = 0.5, size=20))
   }
   
-  TempShades<-expand.grid(Region=unique(Tempsum$Region), Quality=c("Good", "OK", "Bad"))%>%
+  TempShades<-expand.grid(Region=unique(Tempsum$Region), Quality=c("Good", "Marginal", "Bad"))%>%
     mutate(xmin=Start_year,
            xmax=End_year+1,
            ymin=case_when(
              Quality=="Good" ~ min(Tempsum$Temperature-Tempsum$SD),
-             Quality=="OK" ~ 20,
+             Quality=="Marginal" ~ 20,
              Quality=="Bad" ~ 22
            ),
            ymax=case_when(
              Quality=="Good" ~ 20,
-             Quality=="OK" ~ 22,
+             Quality=="Marginal" ~ 22,
              Quality=="Bad" ~ max(Tempsum$Temperature+Tempsum$SD)
            ))
   
