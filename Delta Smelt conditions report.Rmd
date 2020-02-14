@@ -63,7 +63,7 @@ BIV <- DSCBivalver(Data$Bivalves)
 
 # Accessibility
 
-For any assistance accessing the map, graphs, images, or other material in this report, please contact us at [DeltaSmeltReport@deltacouncil.ca.gov](mailto:DeltaSmeltReport@deltacouncil.ca.gov).
+For any assistance accessing the map, graphs, images, or other material in this report, please contact us at [accessibility@deltacouncil.ca.gov](mailto:accessibility@deltacouncil.ca.gov?subject=Delta%20Smelt%20Conditions%20Report).
 
 # Introduction
 
