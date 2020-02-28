@@ -146,7 +146,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
       geom_ribbon(data=Data, aes(x=Year, ymin=!!Parameter-SD, ymax=!!Parameter+SD), alpha=0.4, fill="gray")+
       geom_point(data=filter(Data, Year==End_year), aes(x=Year, y=!!Parameter), color="firebrick3", size=3)+
       scale_y_continuous(expand = expand_scale(0,0))+
-      scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
+      scale_x_continuous(labels=insert_minor(seq(floor(Start_year/10)*10, ceiling(End_year/10)*10, by=5), 4), breaks = (floor(Start_year/10)*10):(ceiling(End_year/10)*10), limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
       facet_wrap(~Region, scales = "free_x")+
       ylab(ylabel)+
       xlab("Date")+
@@ -191,7 +191,7 @@ DSCWQer<-function(Data, Start_year=2002, End_year=2018, Regions=c("Suisun Bay", 
     geom_bar(data=tibble(End_year), aes(x=End_year, y=1), stat="identity", color="firebrick3", fill=NA, size=1)+
     geom_vline(data=Micromissing, aes(xintercept=Year), linetype=2)+
     scale_fill_brewer(type="div", palette="RdYlBu", guide=guide_legend(keyheight=0.8, title=NULL, direction="horizontal", label.position="top", reverse=TRUE))+
-    scale_x_continuous(labels=insert_minor(seq(2000, 2020, by=5), 4), breaks = 2000:2020, limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
+    scale_x_continuous(labels=insert_minor(seq(floor(Start_year/10)*10, ceiling(End_year/10)*10, by=5), 4), breaks = (floor(Start_year/10)*10):(ceiling(End_year/10)*10), limits=c(Start_year,End_year+1), expand=expand_scale(0,0))+
     scale_y_continuous(expand=expand_scale(0,0))+
     facet_wrap(~Region, scales = "free_x")+
     ylab("Relative frequency")+
