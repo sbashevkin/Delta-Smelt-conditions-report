@@ -1,4 +1,4 @@
-WCdatadownloader<-function(Sources=c("FMWT", "STN", "EDSM 20mm", "EDSM KDTR", "EMP Zoop CB", "EMP Zoop Pump", "EMP Phytoplankton", "Dayflow 1997-2018", "Dayflow 1984-1996")){
+DSCdatadownloader<-function(Sources=c("FMWT", "STN", "EDSM 20mm", "EDSM KDTR", "EMP Zoop CB", "EMP Zoop Pump", "EMP Phytoplankton", "Dayflow 1997-2018", "Dayflow 1984-1996")){
   
   
   #FMWT
