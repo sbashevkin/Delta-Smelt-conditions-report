@@ -180,8 +180,8 @@ DSCDater <- function(Start_year=2002, Regions=c("Suisun Bay", "Suisun Marsh", "L
   
   WQ<-sapply(Fieldfiles, function(x) read_excel(x, guess_max = 5e4))%>%
     bind_rows()%>%
-    select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult)%>%
-    filter(Parameter%in%c("Temperature", "Secchi Depth", "Conductance (EC)"))%>%
+    select(Date=SampleDate, Station=StationCode, Parameter=AnalyteName, Value=Result, Notes=TextResult, Matrix)%>%
+    filter(Parameter%in%c("Temperature", "Secchi Depth", "Conductance (EC)") & Matrix=="Water")%>%
     group_by(Date, Station, Parameter, Notes)%>%
     summarise(Value=mean(Value, na.rm=T))%>%
     ungroup()%>%
