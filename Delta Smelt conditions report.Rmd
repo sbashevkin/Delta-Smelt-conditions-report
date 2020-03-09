@@ -246,7 +246,7 @@ Delta Smelt abundance is estimated by 4 IEP surveys that target different life s
 
 ## EDSM Delta Smelt abundance
 
-(ref:DeltasmeltEDSM) Monthly Delta Smelt abundance estimates from the Enhanced Delta Smelt Monitoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s. Raw data are available in <a href="#tab:DeltasmeltEDSMdata"> table 14.</a>
+(ref:DeltasmeltEDSM) Monthly Delta Smelt abundance estimates (with 95% confidence intervals) from the Enhanced Delta Smelt Monitoring survey (EDSM). No Delta Smelt were collected from the Southern Delta. Vertical dotted lines represent months with missing data. Note that the y-axis is on the log scale and the x axis starts in mid 2017. The y axis starts at the lowest estimated detection value; all values below the limit are 0s. Raw data are available in <a href="#tab:DeltasmeltEDSMdata"> table 14.</a>
 
 ```{r DeltasmeltEDSM, fig.height=5, fig.cap="(ref:DeltasmeltEDSM)"}
 FISH$EDSM$Plot
