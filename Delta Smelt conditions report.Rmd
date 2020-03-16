@@ -168,7 +168,7 @@ Secchi depth is a measure of turbidity. **Lower Secchi depth indicates higher tu
 WQ$Salinity$Plot
 ```
 
-**During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities of 1-2 PSU**, are rare in salinities higher than 6 PSU, and are not found in salinities above 14 PSU. Juveniles rely on freshwater and low salinity habitat in the fall to feed, grow, and mature into adults. 
+**During the fall, Delta Smelt prefer fresh to brackish water and are most abundant in salinities less than about 6 PSU**, decline in abundance at higher salinities, and become rare at salinities above about 14 PSU. Juveniles rely on freshwater and low salinity habitat in the fall to feed, grow, and mature into adults. 
 
 # Biotic drivers
 
