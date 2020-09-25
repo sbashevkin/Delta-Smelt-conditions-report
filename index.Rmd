@@ -1,0 +1,5 @@
+---
+output: html_document
+---
+
+# [You can now find the Delta Smelt Conditions Report here.](https://sbashevkin.github.io/deltareportr/Delta_Smelt_conditions_report_2018_fixed.html)
